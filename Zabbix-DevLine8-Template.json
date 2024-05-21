@@ -1,0 +1,876 @@
+{
+    "zabbix_export": {
+        "version": "6.4",
+        "template_groups": [
+            {
+                "uuid": "7df96b18c230490a9a0a9e2307226338",
+                "name": "Templates"
+            }
+        ],
+        "templates": [
+            {
+                "uuid": "2bd6d6a3d51144a2b8cf59ac8cea9a14",
+                "template": "DevLine 8",
+                "name": "DevLine 8",
+                "description": "\u0415\u0441\u043b\u0438 \u043f\u0440\u043e\u0432\u0435\u0440\u043a\u0430 web-\u0441\u0435\u0440\u0432\u0438\u0441\u043e\u0432 \u043d\u0430 80 \u043f\u043e\u0440\u0442 \u043f\u0440\u043e\u0445\u043e\u0434\u0438\u0442, \u0430 \u043d\u0430 \u0434\u0440\u0443\u0433\u0438\u0435 \u043d\u0435\u0442 - \u043d\u0430\u0441\u0442\u0440\u0430\u0438\u0432\u0430\u0442\u044c \u0438\u043b\u0438 \u043e\u0442\u043a\u043b\u044e\u0447\u0430\u0442\u044c SELinux \u043d\u0430 \u0441\u0435\u0440\u0432\u0435\u0440\u0435 \u0438\u043b\u0438 \u043f\u0440\u043e\u043a\u0441\u0438 (\u043e\u0442\u043a\u0443\u0434\u0430 \u0442\u0430\u043c \u0443 \u0437\u0430\u043f\u0440\u043e\u0441\u044b \u0431\u0443\u0434\u0443\u0442 \u0438\u0434\u0442\u0438)",
+                "groups": [
+                    {
+                        "name": "Templates"
+                    }
+                ],
+                "items": [
+                    {
+                        "uuid": "6d7746132c2049b0807ffa0112719205",
+                        "name": "DevLine - \u0412\u0435\u0440\u0441\u0438\u044f API",
+                        "type": "HTTP_AGENT",
+                        "key": "devline.server[api_ver]",
+                        "delay": "3h",
+                        "authtype": "DIGEST",
+                        "username": "{$DEVLINE_LOGIN}",
+                        "password": "{$DEVLINE_PASSWORD}",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.version.value"
+                                ]
+                            }
+                        ],
+                        "url": "http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc",
+                        "posts": "{\n   \"method\" : \"get_version\"\n}",
+                        "status_codes": "",
+                        "post_type": "JSON",
+                        "headers": [
+                            {
+                                "name": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "request_method": "POST",
+                        "output_format": "JSON",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "71338a8714224912b60e513adb4f2b88",
+                        "name": "DevLine - \u0421\u043f\u0438\u0441\u043e\u043a \u043a\u0430\u043c\u0435\u0440",
+                        "type": "HTTP_AGENT",
+                        "key": "devline.server[camera.all]",
+                        "delay": "3h",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "authtype": "DIGEST",
+                        "username": "{$DEVLINE_LOGIN}",
+                        "password": "{$DEVLINE_PASSWORD}",
+                        "preprocessing": [
+                            {
+                                "type": "STR_REPLACE",
+                                "parameters": [
+                                    "\"body\"",
+                                    "\"data\""
+                                ]
+                            }
+                        ],
+                        "url": "http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/cameras",
+                        "status_codes": "",
+                        "headers": [
+                            {
+                                "name": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "output_format": "JSON",
+                        "tags": [
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "f9048fbb00224066839f3a770d5279da",
+                        "name": "DevLine - \u0421\u043e\u0441\u0442\u043e\u044f\u043d\u0438\u0435 \u043a\u0430\u043c\u0435\u0440",
+                        "type": "HTTP_AGENT",
+                        "key": "devline.server[camera.state]",
+                        "delay": "5m",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "authtype": "DIGEST",
+                        "username": "{$DEVLINE_LOGIN}",
+                        "password": "{$DEVLINE_PASSWORD}",
+                        "url": "http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc",
+                        "posts": "{\n   \"method\" : \"monitoring.get_media_state\",\n   \"version\" : {$DEVLINE_API_VER}\n}",
+                        "status_codes": "",
+                        "post_type": "JSON",
+                        "headers": [
+                            {
+                                "name": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "request_method": "POST",
+                        "output_format": "JSON",
+                        "tags": [
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "ee7ef1089efc4dc1827c09317d904fbf",
+                                "expression": "find(/DevLine 8/devline.server[camera.state],,\"like\",\"\\\"message\\\" : \\\"forbidden\\\"\")=1",
+                                "name": "DevLine - Forbidden",
+                                "priority": "HIGH",
+                                "description": "\u0421\u0435\u0440\u0432\u0435\u0440 \u0432\u0435\u0440\u043d\u0443\u043b \u043e\u0448\u0438\u0431\u043a\u0443 \u043e \u0442\u043e\u043c, \u0447\u0442\u043e \u0443 \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f \u043d\u0435\u0434\u043e\u0441\u0442\u0430\u0442\u043e\u0447\u043d\u043e \u043f\u0440\u0430\u0432. \u041d\u0443\u0436\u043d\u043e \u043f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c \u043d\u0430\u043b\u0438\u0447\u0438\u0435 \u043f\u0440\u0430\u0432\u0430 \u0410\u0434\u043c\u0438\u043d\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u0435 -> \u041f\u0440\u043e\u0441\u043c\u043e\u0442\u0440 \u043c\u043e\u043d\u0438\u0442\u043e\u0440\u0438\u043d\u0433\u0430"
+                            },
+                            {
+                                "uuid": "7553f56f805e4d5a8772a099cfa8e631",
+                                "expression": "last(/DevLine 8/devline.server[camera.state])=\"{\\\"body\\\":\\\"<HTML><HEAD><TITLE>401 - Unauthorized</TITLE></HEAD><BODY><H1>401 - Unauthorized</H1><P></P></BODY></HTML>\\\"}\"",
+                                "name": "DevLine - User Unauthorized",
+                                "priority": "HIGH",
+                                "description": "\u0421\u0435\u0440\u0432\u0435\u0440 \u043d\u0435 \u043d\u0430\u0448\u0435\u043b \u0443 \u0441\u0435\u0431\u044f \u043f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044f \u0441 \u0443\u043a\u0430\u0437\u0430\u043d\u043d\u044b\u043c\u0438 \u0438\u043c\u0435\u043d\u0435\u043c \u0438 \u043f\u0430\u0440\u043e\u043b\u0435\u043c"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "35379382ca5c4c7a97fea767ba3c183a",
+                        "name": "DevLine - \u0414\u0430\u043d\u043d\u044b\u0435 \u0441\u0435\u0440\u0432\u0435\u0440\u0430",
+                        "type": "HTTP_AGENT",
+                        "key": "devline.server[features.all]",
+                        "delay": "3h",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "authtype": "DIGEST",
+                        "username": "{$DEVLINE_LOGIN}",
+                        "password": "{$DEVLINE_PASSWORD}",
+                        "url": "http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc",
+                        "posts": "{\n   \"method\" : \"get_server_info\",\n   \"version\" : {$DEVLINE_API_VER}\n}",
+                        "status_codes": "",
+                        "post_type": "JSON",
+                        "headers": [
+                            {
+                                "name": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "request_method": "POST",
+                        "output_format": "JSON",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "a0f47292dc004276b4eabdc8fd4c487f",
+                        "name": "DevLine - Demo State",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[features.demo]",
+                        "delay": "0",
+                        "valuemap": {
+                            "name": "DevLine Demo State"
+                        },
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.info.demo"
+                                ]
+                            },
+                            {
+                                "type": "STR_REPLACE",
+                                "parameters": [
+                                    "false",
+                                    "0"
+                                ]
+                            },
+                            {
+                                "type": "STR_REPLACE",
+                                "parameters": [
+                                    "true",
+                                    "1"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[features.all]"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "00f7204007fd45ce96c4e50a5c1b4dc2",
+                        "name": "DevLine - HTTP port",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[features.http]",
+                        "delay": "0",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.info.network.ports.http"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[features.all]"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "e2a1b8880b6a4180886566b681e5d0e0",
+                        "name": "DevLine - Main port",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[features.main]",
+                        "delay": "0",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.info.network.ports.main"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[features.all]"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "6c4358d9f1224bc1b5ce1b432ea6858f",
+                        "name": "DevLine - Server Name",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[features.name]",
+                        "delay": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.info.name"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[features.all]"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "9b2fd14125074329bd68738ba8be094b",
+                        "name": "DevLine - Ping port",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[features.ping]",
+                        "delay": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.info.network.ports.ping"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[features.all]"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "9d9d749a7bfd41cf9fcd180f79fdde93",
+                        "name": "DevLine - RTSP port",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[features.rtsp]",
+                        "delay": "0",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.info.network.ports.rtsp"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[features.all]"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "203bd087310446ae9af3a2691527d179",
+                        "name": "DevLine - Server Target",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[features.target]",
+                        "delay": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.info.target"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[features.all]"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "2e6ef4863e1c4787b2002517edff5272",
+                        "name": "DevLine - Server type",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[features.type]",
+                        "delay": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.info.type"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[features.all]"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "0ab6647cccce4e1a916255b1d19a16f2",
+                        "name": "DevLine - Server Version",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[features.version]",
+                        "delay": "0",
+                        "trends": "0",
+                        "value_type": "CHAR",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.info.version.name"
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[features.all]"
+                        },
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Inventory"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
+                            }
+                        ],
+                        "triggers": [
+                            {
+                                "uuid": "d68f7a0a4fe14aa3acbca8c2d5af544c",
+                                "expression": "last(/DevLine 8/devline.server[features.version],#2)<>last(/DevLine 8/devline.server[features.version])",
+                                "name": "DevLine Version was changed",
+                                "priority": "INFO",
+                                "manual_close": "YES"
+                            }
+                        ]
+                    }
+                ],
+                "discovery_rules": [
+                    {
+                        "uuid": "9621463e20e44d16880de7b3c2c708bd",
+                        "name": "Camera discovery",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[camera.discovery]",
+                        "delay": "0",
+                        "lifetime": "5d",
+                        "item_prototypes": [
+                            {
+                                "uuid": "1a47f2db27f74ddca3110187cb29483d",
+                                "name": "Devline - {#NAME} Admin State",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[camera.{#NUM}.admin.state]",
+                                "delay": "0",
+                                "valuemap": {
+                                    "name": "Devline Camera Admin State"
+                                },
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.body.result.state.cameras.{#NUM}.enabled"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "true",
+                                            "1"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "false",
+                                            "0"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[camera.state]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Camera",
+                                        "value": "{#NAME}"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "c6fed9a1ce7f4e55b926e681c0628eb8",
+                                "name": "Devline - Camera {#NUM} Name",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[camera.{#NUM}.name]",
+                                "delay": "0",
+                                "trends": "0",
+                                "status": "DISABLED",
+                                "discover": "NO_DISCOVER",
+                                "value_type": "CHAR",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.data.[{#NUM}].name"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[camera.all]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Camera",
+                                        "value": "{#NAME}"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "4d3dfb1988ca4703a62938a7a61db551",
+                                "name": "Devline - {#NAME} Stream1 Admin State",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[camera.{#NUM}.stream1.admin.state]",
+                                "delay": "0",
+                                "valuemap": {
+                                    "name": "Devline Camera Admin State"
+                                },
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.body.result.state.cameras.{#NUM}.streams.video.enabled"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "true",
+                                            "1"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "false",
+                                            "0"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[camera.state]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Camera",
+                                        "value": "{#NAME}"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "ff6cc7576db947ba8627f369b048a678",
+                                "name": "Devline - {#NAME} Stream1 Status",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[camera.{#NUM}.stream1.status]",
+                                "delay": "0",
+                                "valuemap": {
+                                    "name": "DevLine Stream Status"
+                                },
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.body.result.state.cameras.{#NUM}.streams.video.active"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "true",
+                                            "1"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "false",
+                                            "0"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[camera.state]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Camera",
+                                        "value": "{#NAME}"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "2939cfc5afed4e6d80e7adb040901794",
+                                "name": "Devline - {#NAME} Stream2 Admin State",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[camera.{#NUM}.stream2.admin.state]",
+                                "delay": "0",
+                                "valuemap": {
+                                    "name": "Devline Camera Admin State"
+                                },
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.body.result.state.cameras.{#NUM}.streams.video2.enabled"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "true",
+                                            "1"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "false",
+                                            "0"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[camera.state]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Camera",
+                                        "value": "{#NAME}"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "a733e70831b84329ac4c7365b0668387",
+                                "name": "Devline - {#NAME} Stream2 Status",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[camera.{#NUM}.stream2.status]",
+                                "delay": "0",
+                                "valuemap": {
+                                    "name": "DevLine Stream Status"
+                                },
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.body.result.state.cameras.{#NUM}.streams.video2.active"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "true",
+                                            "1"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "false",
+                                            "0"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[camera.state]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Camera",
+                                        "value": "{#NAME}"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    }
+                                ]
+                            }
+                        ],
+                        "trigger_prototypes": [
+                            {
+                                "uuid": "ed1152ca4d93493f90b347e86667ae8c",
+                                "expression": "last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0",
+                                "name": "DevLine - {#NAME} Fail",
+                                "opdata": "Camera - {ITEM.LASTVALUE1}, Stream1 - {ITEM.LASTVALUE3}, Stream2 - {ITEM.LASTVALUE5}",
+                                "priority": "AVERAGE"
+                            },
+                            {
+                                "uuid": "f47d5396908e49e88620a23691748abb",
+                                "expression": "last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0",
+                                "name": "DevLine - {#NAME} Stream1 Fail",
+                                "opdata": "{ITEM.LASTVALUE3}",
+                                "priority": "WARNING",
+                                "dependencies": [
+                                    {
+                                        "name": "DevLine - {#NAME} Fail",
+                                        "expression": "last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "468fbf6acf2f4d2780db6d7d73ebc2b9",
+                                "expression": "last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0",
+                                "name": "DevLine - {#NAME} Stream2 Fail",
+                                "opdata": "{ITEM.LASTVALUE3}",
+                                "priority": "WARNING",
+                                "manual_close": "YES",
+                                "dependencies": [
+                                    {
+                                        "name": "DevLine - {#NAME} Fail",
+                                        "expression": "last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0"
+                                    }
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[camera.all]"
+                        },
+                        "lld_macro_paths": [
+                            {
+                                "lld_macro": "{#NAME}",
+                                "path": "$.name"
+                            },
+                            {
+                                "lld_macro": "{#NUM}",
+                                "path": "$.uri"
+                            }
+                        ],
+                        "preprocessing": [
+                            {
+                                "type": "STR_REPLACE",
+                                "parameters": [
+                                    "/cameras/",
+                                    ""
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "macros": [
+                    {
+                        "macro": "{$DEVLINE_API_VER}",
+                        "value": "45",
+                        "description": "\u041d\u0430 \u043c\u043e\u043c\u0435\u043d\u0442 \u043d\u0430\u043f\u0438\u0441\u0430\u043d\u0438\u044f \u0448\u0430\u0431\u043b\u043e\u043d\u0430 \u0430\u043a\u0442\u0443\u0430\u043b\u044c\u043d\u0430\u044f - \u044d\u0442\u043e 79 \u0432\u0435\u0440\u0441\u0438\u044f. \u041d\u043e \u043c\u043e\u0436\u0435\u0442 \u0431\u044b\u0442\u044c \u0434\u0440\u0443\u0433\u043e\u0439"
+                    },
+                    {
+                        "macro": "{$DEVLINE_HTTP_PORT}",
+                        "value": "9786",
+                        "description": "\u041f\u043e\u0440\u0442 \u0434\u043b\u044f HTTP-\u0437\u0430\u043f\u0440\u043e\u0441\u043e\u0432 DevLine. \u041f\u043e \u0443\u043c\u043e\u043b\u0447\u0430\u043d\u0438\u044e - 9786 \u043f\u043e\u0440\u0442"
+                    },
+                    {
+                        "macro": "{$DEVLINE_LOGIN}",
+                        "value": "admin"
+                    },
+                    {
+                        "macro": "{$DEVLINE_PASSWORD}"
+                    }
+                ],
+                "valuemaps": [
+                    {
+                        "uuid": "7dfff5118d49452ea6fd344ffd3b3853",
+                        "name": "Devline Camera Admin State",
+                        "mappings": [
+                            {
+                                "value": "1",
+                                "newvalue": "Enabled"
+                            },
+                            {
+                                "value": "0",
+                                "newvalue": "Off"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "d4cf65d6b75644dbae012d5542438868",
+                        "name": "DevLine Demo State",
+                        "mappings": [
+                            {
+                                "value": "1",
+                                "newvalue": "Demo"
+                            },
+                            {
+                                "value": "0",
+                                "newvalue": "Commercial"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "7cca203cf1dc4a108dd137223d3f57f9",
+                        "name": "DevLine Stream Status",
+                        "mappings": [
+                            {
+                                "value": "1",
+                                "newvalue": "OK"
+                            },
+                            {
+                                "value": "0",
+                                "newvalue": "Fail"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
