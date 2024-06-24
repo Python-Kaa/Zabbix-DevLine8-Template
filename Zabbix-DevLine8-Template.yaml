@@ -510,6 +510,7 @@ zabbix_export:
         - macro: '{$DEVLINE_LOGIN}'
           value: admin
         - macro: '{$DEVLINE_PASSWORD}'
+          type: SECRET_TEXT
       valuemaps:
         - uuid: 7dfff5118d49452ea6fd344ffd3b3853
           name: 'Devline Camera Admin State'

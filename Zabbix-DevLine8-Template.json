@@ -823,7 +823,8 @@
                         "value": "admin"
                     },
                     {
-                        "macro": "{$DEVLINE_PASSWORD}"
+                        "macro": "{$DEVLINE_PASSWORD}",
+                        "type": "SECRET_TEXT"
                     }
                 ],
                 "valuemaps": [

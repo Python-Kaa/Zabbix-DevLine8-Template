@@ -832,6 +832,7 @@
                 </macro>
                 <macro>
                     <macro>{$DEVLINE_PASSWORD}</macro>
+                    <type>SECRET_TEXT</type>
                 </macro>
             </macros>
             <valuemaps>
