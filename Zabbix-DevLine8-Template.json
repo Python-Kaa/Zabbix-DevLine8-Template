@@ -37,9 +37,9 @@
                             }
                         ],
                         "url": "http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc",
-                        "posts": "{\n   \"method\" : \"get_version\"\n}",
                         "status_codes": "",
                         "post_type": "JSON",
+                        "posts": "{\n   \"method\" : \"get_version\"\n}",
                         "headers": [
                             {
                                 "name": "Accept",
@@ -69,8 +69,8 @@
                         "type": "HTTP_AGENT",
                         "key": "devline.server[camera.all]",
                         "delay": "3h",
-                        "trends": "0",
                         "value_type": "CHAR",
+                        "trends": "0",
                         "authtype": "DIGEST",
                         "username": "{$DEVLINE_LOGIN}",
                         "password": "{$DEVLINE_PASSWORD}",
@@ -109,15 +109,15 @@
                         "type": "HTTP_AGENT",
                         "key": "devline.server[camera.state]",
                         "delay": "5m",
-                        "trends": "0",
                         "value_type": "CHAR",
+                        "trends": "0",
                         "authtype": "DIGEST",
                         "username": "{$DEVLINE_LOGIN}",
                         "password": "{$DEVLINE_PASSWORD}",
                         "url": "http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc",
-                        "posts": "{\n   \"method\" : \"monitoring.get_media_state\",\n   \"version\" : {$DEVLINE_API_VER}\n}",
                         "status_codes": "",
                         "post_type": "JSON",
+                        "posts": "{\n   \"method\" : \"monitoring.get_media_state\",\n   \"version\" : {$DEVLINE_API_VER}\n}",
                         "headers": [
                             {
                                 "name": "Accept",
@@ -159,15 +159,15 @@
                         "type": "HTTP_AGENT",
                         "key": "devline.server[features.all]",
                         "delay": "3h",
-                        "trends": "0",
                         "value_type": "CHAR",
+                        "trends": "0",
                         "authtype": "DIGEST",
                         "username": "{$DEVLINE_LOGIN}",
                         "password": "{$DEVLINE_PASSWORD}",
                         "url": "http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc",
-                        "posts": "{\n   \"method\" : \"get_server_info\",\n   \"version\" : {$DEVLINE_API_VER}\n}",
                         "status_codes": "",
                         "post_type": "JSON",
+                        "posts": "{\n   \"method\" : \"get_server_info\",\n   \"version\" : {$DEVLINE_API_VER}\n}",
                         "headers": [
                             {
                                 "name": "Accept",
@@ -298,8 +298,8 @@
                         "type": "DEPENDENT",
                         "key": "devline.server[features.name]",
                         "delay": "0",
-                        "trends": "0",
                         "value_type": "CHAR",
+                        "trends": "0",
                         "preprocessing": [
                             {
                                 "type": "JSONPATH",
@@ -328,8 +328,8 @@
                         "type": "DEPENDENT",
                         "key": "devline.server[features.ping]",
                         "delay": "0",
-                        "trends": "0",
                         "value_type": "CHAR",
+                        "trends": "0",
                         "preprocessing": [
                             {
                                 "type": "JSONPATH",
@@ -386,8 +386,8 @@
                         "type": "DEPENDENT",
                         "key": "devline.server[features.target]",
                         "delay": "0",
-                        "trends": "0",
                         "value_type": "CHAR",
+                        "trends": "0",
                         "preprocessing": [
                             {
                                 "type": "JSONPATH",
@@ -416,8 +416,8 @@
                         "type": "DEPENDENT",
                         "key": "devline.server[features.type]",
                         "delay": "0",
-                        "trends": "0",
                         "value_type": "CHAR",
+                        "trends": "0",
                         "preprocessing": [
                             {
                                 "type": "JSONPATH",
@@ -446,8 +446,8 @@
                         "type": "DEPENDENT",
                         "key": "devline.server[features.version]",
                         "delay": "0",
-                        "trends": "0",
                         "value_type": "CHAR",
+                        "trends": "0",
                         "preprocessing": [
                             {
                                 "type": "JSONPATH",
@@ -476,6 +476,59 @@
                                 "name": "DevLine Version was changed",
                                 "priority": "INFO",
                                 "manual_close": "YES"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "1ce3cd6f45ce43df8d1aea529a9a03b9",
+                        "name": "DevLine - \u0425\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0430",
+                        "type": "HTTP_AGENT",
+                        "key": "devline.server[storage.state]",
+                        "delay": "5m",
+                        "value_type": "CHAR",
+                        "trends": "0",
+                        "authtype": "DIGEST",
+                        "username": "{$DEVLINE_LOGIN}",
+                        "password": "{$DEVLINE_PASSWORD}",
+                        "preprocessing": [
+                            {
+                                "type": "JSONPATH",
+                                "parameters": [
+                                    "$.body.result.state"
+                                ]
+                            },
+                            {
+                                "type": "STR_REPLACE",
+                                "parameters": [
+                                    "{\"storages\":[",
+                                    "{\"data\":["
+                                ]
+                            }
+                        ],
+                        "url": "http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc",
+                        "status_codes": "",
+                        "post_type": "JSON",
+                        "posts": "{\n   \"method\" : \"monitoring.get_archive_state\",\n   \"version\" : {$DEVLINE_API_VER}\n}",
+                        "headers": [
+                            {
+                                "name": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "request_method": "POST",
+                        "output_format": "JSON",
+                        "tags": [
+                            {
+                                "tag": "Application",
+                                "value": "Storage"
+                            },
+                            {
+                                "tag": "Service",
+                                "value": "DevLine"
                             }
                         ]
                     }
@@ -540,10 +593,10 @@
                                 "type": "DEPENDENT",
                                 "key": "devline.server[camera.{#NUM}.name]",
                                 "delay": "0",
+                                "value_type": "CHAR",
                                 "trends": "0",
                                 "status": "DISABLED",
                                 "discover": "NO_DISCOVER",
-                                "value_type": "CHAR",
                                 "preprocessing": [
                                     {
                                         "type": "JSONPATH",
@@ -753,7 +806,13 @@
                                 "expression": "last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0",
                                 "name": "DevLine - {#NAME} Fail",
                                 "opdata": "Camera - {ITEM.LASTVALUE1}, Stream1 - {ITEM.LASTVALUE3}, Stream2 - {ITEM.LASTVALUE5}",
-                                "priority": "AVERAGE"
+                                "priority": "AVERAGE",
+                                "tags": [
+                                    {
+                                        "tag": "Camera",
+                                        "value": "{#NAME}"
+                                    }
+                                ]
                             },
                             {
                                 "uuid": "f47d5396908e49e88620a23691748abb",
@@ -765,6 +824,12 @@
                                     {
                                         "name": "DevLine - {#NAME} Fail",
                                         "expression": "last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0"
+                                    }
+                                ],
+                                "tags": [
+                                    {
+                                        "tag": "Camera",
+                                        "value": "{#NAME}"
                                     }
                                 ]
                             },
@@ -779,6 +844,12 @@
                                     {
                                         "name": "DevLine - {#NAME} Fail",
                                         "expression": "last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0"
+                                    }
+                                ],
+                                "tags": [
+                                    {
+                                        "tag": "Camera",
+                                        "value": "{#NAME}"
                                     }
                                 ]
                             }
@@ -805,13 +876,359 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "uuid": "9909a58739014ec2b27cfafd53586e60",
+                        "name": "Storage discovery",
+                        "type": "DEPENDENT",
+                        "key": "devline.server[storage.discovery]",
+                        "delay": "0",
+                        "lifetime": "14d",
+                        "item_prototypes": [
+                            {
+                                "uuid": "5e64e32c19ff42de9104bd00d3ecf058",
+                                "name": "Devline - Storage {#PATH} free space",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[storage.{#PATH}.free_space]",
+                                "delay": "0",
+                                "units": "b",
+                                "description": "\u041e\u0431\u044a\u0435\u043c \u0441\u0432\u043e\u0431\u043e\u0434\u043d\u043e\u0433\u043e \u043c\u0435\u0441\u0442\u043e \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435",
+                                "valuemap": {
+                                    "name": "DevLine Storage Availability"
+                                },
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.data[?(@.path == \"{#PATH}\")].free_space"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "[",
+                                            ""
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "]",
+                                            ""
+                                        ]
+                                    },
+                                    {
+                                        "type": "MULTIPLIER",
+                                        "parameters": [
+                                            "1000000"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[storage.state]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Application",
+                                        "value": "Storage"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    },
+                                    {
+                                        "tag": "Storage",
+                                        "value": "{#PATH}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "71d60ffc0444491188b3d70aa407385c",
+                                "name": "Devline - Storage {#PATH} state",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[storage.{#PATH}.state]",
+                                "delay": "0",
+                                "description": "\u0424\u043b\u0430\u0433 \u0434\u043e\u0441\u0442\u0443\u043f\u043d\u043e\u0441\u0442\u0438 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0430",
+                                "valuemap": {
+                                    "name": "DevLine Storage Availability"
+                                },
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.data[?(@.path == \"{#PATH}\")].available"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "[true]",
+                                            "1"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "[false]",
+                                            "0"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[storage.state]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Application",
+                                        "value": "Storage"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    },
+                                    {
+                                        "tag": "Storage",
+                                        "value": "{#PATH}"
+                                    }
+                                ],
+                                "trigger_prototypes": [
+                                    {
+                                        "uuid": "ba534f3e460a412b8548034edd088fe1",
+                                        "expression": "last(/DevLine 8/devline.server[storage.{#PATH}.state],#2)=0",
+                                        "name": "\u0425\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH} \u043d\u0435\u0434\u043e\u0441\u0442\u0443\u043f\u043d\u043e",
+                                        "priority": "HIGH"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "c572d58bb66e45768984bf77d7e85c67",
+                                "name": "Devline - Storage {#PATH} write datarate",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[storage.{#PATH}.write.datarate]",
+                                "delay": "0",
+                                "value_type": "FLOAT",
+                                "units": "b/s",
+                                "description": "\u0421\u0440\u0435\u0434\u043d\u0435\u0435 \u0437\u0430 \u043d\u0435\u0441\u043a\u043e\u043b\u044c\u043a\u043e \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0445 \u0441\u0435\u043a\u0443\u043d\u0434 \u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432\u043e \u0431\u0430\u0439\u0442 \u0434\u0430\u043d\u043d\u044b\u0445, \u043f\u043e\u0441\u0442\u0443\u043f\u0430\u044e\u0449\u0438\u0445 \u043d\u0430 \u0437\u0430\u043f\u0438\u0441\u044c \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.data[?(@.path == \"{#PATH}\")].write.datarate"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "[",
+                                            ""
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "]",
+                                            ""
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[storage.state]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Application",
+                                        "value": "Storage"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    },
+                                    {
+                                        "tag": "Storage",
+                                        "value": "{#PATH}"
+                                    }
+                                ],
+                                "trigger_prototypes": [
+                                    {
+                                        "uuid": "d888576bc3704bf7bf53a7e59afb2720",
+                                        "expression": "max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_HIGH})=0",
+                                        "name": "\u041d\u0435 \u0438\u0434\u0435\u0442 \u0437\u0430\u043f\u0438\u0441\u044c \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH} \u0432 \u0442\u0435\u0447\u0435\u043d\u0438\u0435 {$DEVLINE_RECORD_HIGH}",
+                                        "discover": "NO_DISCOVER",
+                                        "priority": "HIGH",
+                                        "tags": [
+                                            {
+                                                "tag": "Service",
+                                                "value": "DevLine"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "uuid": "9a5a1771eafa4e4eb9d263407bbc83f3",
+                                        "expression": "max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_INFO})=0",
+                                        "name": "\u041d\u0435 \u0438\u0434\u0435\u0442 \u0437\u0430\u043f\u0438\u0441\u044c \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH} \u0432 \u0442\u0435\u0447\u0435\u043d\u0438\u0435 {$DEVLINE_RECORD_INFO}",
+                                        "discover": "NO_DISCOVER",
+                                        "priority": "INFO",
+                                        "dependencies": [
+                                            {
+                                                "name": "\u041d\u0435 \u0438\u0434\u0435\u0442 \u0437\u0430\u043f\u0438\u0441\u044c \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH} \u0432 \u0442\u0435\u0447\u0435\u043d\u0438\u0435 {$DEVLINE_RECORD_HIGH}",
+                                                "expression": "max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_HIGH})=0"
+                                            },
+                                            {
+                                                "name": "\u041d\u0435 \u0438\u0434\u0435\u0442 \u0437\u0430\u043f\u0438\u0441\u044c \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH} \u0432 \u0442\u0435\u0447\u0435\u043d\u0438\u0435 {$DEVLINE_RECORD_WARN}",
+                                                "expression": "max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_WARN})=0"
+                                            }
+                                        ],
+                                        "tags": [
+                                            {
+                                                "tag": "Service",
+                                                "value": "DevLine"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "uuid": "2690c46f731540beb9ed712bccb1f76c",
+                                        "expression": "max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_WARN})=0",
+                                        "name": "\u041d\u0435 \u0438\u0434\u0435\u0442 \u0437\u0430\u043f\u0438\u0441\u044c \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH} \u0432 \u0442\u0435\u0447\u0435\u043d\u0438\u0435 {$DEVLINE_RECORD_WARN}",
+                                        "discover": "NO_DISCOVER",
+                                        "priority": "WARNING",
+                                        "dependencies": [
+                                            {
+                                                "name": "\u041d\u0435 \u0438\u0434\u0435\u0442 \u0437\u0430\u043f\u0438\u0441\u044c \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH} \u0432 \u0442\u0435\u0447\u0435\u043d\u0438\u0435 {$DEVLINE_RECORD_HIGH}",
+                                                "expression": "max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_HIGH})=0"
+                                            }
+                                        ],
+                                        "tags": [
+                                            {
+                                                "tag": "Service",
+                                                "value": "DevLine"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "224125bb59c34ce49bb912346374d0b3",
+                                "name": "Devline - Storage {#PATH} last error time",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[storage.{#PATH}.write.error]",
+                                "delay": "0",
+                                "value_type": "CHAR",
+                                "trends": "0",
+                                "description": "\u0412\u0440\u0435\u043c\u044f \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0435\u0439 \u043e\u0448\u0438\u0431\u043a\u0438 \u0437\u0430\u043f\u0438\u0441\u0438 \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 \u0432 \u0444\u043e\u0440\u043c\u0430\u0442\u0435 [\u0433\u043e\u0434, \u043c\u0435\u0441\u044f\u0446, \u0434\u0435\u043d\u044c, \u0447\u0430\u0441, \u043c\u0438\u043d\u0443\u0442\u0430, \u0441\u0435\u043a\u0443\u043d\u0434\u0430, \u043c\u0438\u043b\u043b\u0438\u0441\u0435\u043a\u0443\u043d\u0434\u0430]\n\u0415\u0441\u043b\u0438 \u044d\u043b\u0435\u043c\u0435\u043d\u0442 \u043d\u0435 \u043e\u0431\u043d\u0430\u0440\u0443\u0436\u0438\u0432\u0430\u0435\u0442\u0441\u044f, \u0441\u0447\u0438\u0442\u0430\u0435\u043c, \u0447\u0442\u043e \u0432\u0441\u0451 \u0445\u043e\u0440\u043e\u0448\u043e",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.data[?(@.path == \"{#PATH}\")].last_error_time"
+                                        ],
+                                        "error_handler": "CUSTOM_VALUE",
+                                        "error_handler_params": "-"
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "[",
+                                            ""
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "]",
+                                            ""
+                                        ]
+                                    },
+                                    {
+                                        "type": "JAVASCRIPT",
+                                        "parameters": [
+                                            "if (value == \"-\"){\n   return \"OK\";\n}\n\ndate = value.split(',');\n\nfor (i = 0; i < date.length; i++){\n   if (date[i] < 10){\n      date[i] = \"0\" + date[i];\n   }\n}\n\nreturn date[3] + \":\" + date[4] + \":\" + date[5] + \".\" + date[6] + \" \" + date[2] + \".\" + date[1] + \".\" + date[0];"
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[storage.state]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Application",
+                                        "value": "Storage"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    },
+                                    {
+                                        "tag": "Storage",
+                                        "value": "{#PATH}"
+                                    }
+                                ]
+                            },
+                            {
+                                "uuid": "1a3b9983e2134a7baa51c459e4aeca2e",
+                                "name": "Devline - Storage {#PATH} write queue",
+                                "type": "DEPENDENT",
+                                "key": "devline.server[storage.{#PATH}.write.queue]",
+                                "delay": "0",
+                                "value_type": "FLOAT",
+                                "units": "b",
+                                "description": "\u041c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u043e\u0435 \u0437\u0430 \u043d\u0435\u0441\u043a\u043e\u043b\u044c\u043a\u043e \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0445 \u0441\u0435\u043a\u0443\u043d\u0434 \u043e\u0442\u043d\u043e\u0441\u0438\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u0437\u043d\u0430\u0447\u0435\u043d\u0438\u0435 \u0440\u0430\u0437\u043c\u0435\u0440\u0430 \u043e\u0447\u0435\u0440\u0435\u0434\u0438 \u0437\u0430\u043f\u0438\u0441\u0438 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0430 \u043e\u0442 \u043c\u0430\u043a\u0441\u0438\u043c\u0430\u043b\u044c\u043d\u043e \u0432\u043e\u0437\u043c\u043e\u0436\u043d\u043e\u0433\u043e",
+                                "preprocessing": [
+                                    {
+                                        "type": "JSONPATH",
+                                        "parameters": [
+                                            "$.data[?(@.path == \"{#PATH}\")].write.queue_size"
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "[",
+                                            ""
+                                        ]
+                                    },
+                                    {
+                                        "type": "STR_REPLACE",
+                                        "parameters": [
+                                            "]",
+                                            ""
+                                        ]
+                                    }
+                                ],
+                                "master_item": {
+                                    "key": "devline.server[storage.state]"
+                                },
+                                "tags": [
+                                    {
+                                        "tag": "Application",
+                                        "value": "Storage"
+                                    },
+                                    {
+                                        "tag": "Service",
+                                        "value": "DevLine"
+                                    },
+                                    {
+                                        "tag": "Storage",
+                                        "value": "{#PATH}"
+                                    }
+                                ]
+                            }
+                        ],
+                        "master_item": {
+                            "key": "devline.server[storage.state]"
+                        },
+                        "lld_macro_paths": [
+                            {
+                                "lld_macro": "{#PATH}",
+                                "path": "$.path"
+                            }
+                        ]
                     }
                 ],
                 "macros": [
                     {
                         "macro": "{$DEVLINE_API_VER}",
-                        "value": "45",
-                        "description": "\u041d\u0430 \u043c\u043e\u043c\u0435\u043d\u0442 \u043d\u0430\u043f\u0438\u0441\u0430\u043d\u0438\u044f \u0448\u0430\u0431\u043b\u043e\u043d\u0430 \u0430\u043a\u0442\u0443\u0430\u043b\u044c\u043d\u0430\u044f - \u044d\u0442\u043e 79 \u0432\u0435\u0440\u0441\u0438\u044f. \u041d\u043e \u043c\u043e\u0436\u0435\u0442 \u0431\u044b\u0442\u044c \u0434\u0440\u0443\u0433\u043e\u0439"
+                        "value": "79",
+                        "description": "\u041d\u0430 \u043c\u043e\u043c\u0435\u043d\u0442 \u043d\u0430\u043f\u0438\u0441\u0430\u043d\u0438\u044f \u0448\u0430\u0431\u043b\u043e\u043d\u0430 \u0430\u043a\u0442\u0443\u0430\u043b\u044c\u043d\u0430\u044f - \u044d\u0442\u043e 79 \u0432\u0435\u0440\u0441\u0438\u044f. \u041d\u043e \u043c\u043e\u0436\u0435\u0442 \u0431\u044b\u0442\u044c \u0434\u0440\u0443\u0433\u043e\u0439 (\u0448\u0430\u0431\u043b\u043e\u043d \u0442\u043e\u0447\u043d\u043e \u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442 \u043d\u0430 45)"
                     },
                     {
                         "macro": "{$DEVLINE_HTTP_PORT}",
@@ -825,6 +1242,21 @@
                     {
                         "macro": "{$DEVLINE_PASSWORD}",
                         "type": "SECRET_TEXT"
+                    },
+                    {
+                        "macro": "{$DEVLINE_RECORD_HIGH}",
+                        "value": "24h",
+                        "description": "\u041f\u0435\u0440\u0438\u043e\u0434 \u0434\u043b\u044f \u0444\u043e\u0440\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f \u043e\u0448\u0438\u0431\u043a\u0438 \u0437\u0430\u043f\u0438\u0441\u0438 \u0432\u0430\u0436\u043d\u043e\u0441\u0442\u0438 \"High\""
+                    },
+                    {
+                        "macro": "{$DEVLINE_RECORD_INFO}",
+                        "value": "30m",
+                        "description": "\u041f\u0435\u0440\u0438\u043e\u0434 \u0434\u043b\u044f \u0444\u043e\u0440\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f \u043e\u0448\u0438\u0431\u043a\u0438 \u0437\u0430\u043f\u0438\u0441\u0438 \u0432\u0430\u0436\u043d\u043e\u0441\u0442\u0438 \"Info\""
+                    },
+                    {
+                        "macro": "{$DEVLINE_RECORD_WARN}",
+                        "value": "3h",
+                        "description": "\u041f\u0435\u0440\u0438\u043e\u0434 \u0434\u043b\u044f \u0444\u043e\u0440\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f \u043e\u0448\u0438\u0431\u043a\u0438 \u0437\u0430\u043f\u0438\u0441\u0438 \u0432\u0430\u0436\u043d\u043e\u0441\u0442\u0438 \"Warning\""
                     }
                 ],
                 "valuemaps": [
@@ -853,6 +1285,20 @@
                             {
                                 "value": "0",
                                 "newvalue": "Commercial"
+                            }
+                        ]
+                    },
+                    {
+                        "uuid": "615a7d20b1c64e60bb9679b8af065b13",
+                        "name": "DevLine Storage Availability",
+                        "mappings": [
+                            {
+                                "value": "1",
+                                "newvalue": "Available"
+                            },
+                            {
+                                "value": "0",
+                                "newvalue": "Fail"
                             }
                         ]
                     },
