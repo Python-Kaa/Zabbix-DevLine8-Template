@@ -35,6 +35,12 @@
                                 <parameter>$.body.result.version.value</parameter>
                             </parameters>
                         </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
                     </preprocessing>
                     <url>http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc</url>
                     <status_codes/>
@@ -229,6 +235,12 @@
                                 <parameter>1</parameter>
                             </parameters>
                         </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
                     </preprocessing>
                     <master_item>
                         <key>devline.server[features.all]</key>
@@ -257,6 +269,12 @@
                                 <parameter>$.body.result.info.network.ports.http</parameter>
                             </parameters>
                         </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
                     </preprocessing>
                     <master_item>
                         <key>devline.server[features.all]</key>
@@ -283,6 +301,12 @@
                             <type>JSONPATH</type>
                             <parameters>
                                 <parameter>$.body.result.info.network.ports.main</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
                             </parameters>
                         </step>
                     </preprocessing>
@@ -315,6 +339,12 @@
                                 <parameter>$.body.result.info.name</parameter>
                             </parameters>
                         </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
                     </preprocessing>
                     <master_item>
                         <key>devline.server[features.all]</key>
@@ -345,6 +375,12 @@
                                 <parameter>$.body.result.info.network.ports.ping</parameter>
                             </parameters>
                         </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
                     </preprocessing>
                     <master_item>
                         <key>devline.server[features.all]</key>
@@ -371,6 +407,12 @@
                             <type>JSONPATH</type>
                             <parameters>
                                 <parameter>$.body.result.info.network.ports.rtsp</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
                             </parameters>
                         </step>
                     </preprocessing>
@@ -403,6 +445,12 @@
                                 <parameter>$.body.result.info.target</parameter>
                             </parameters>
                         </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
                     </preprocessing>
                     <master_item>
                         <key>devline.server[features.all]</key>
@@ -433,6 +481,12 @@
                                 <parameter>$.body.result.info.type</parameter>
                             </parameters>
                         </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
                     </preprocessing>
                     <master_item>
                         <key>devline.server[features.all]</key>
@@ -461,6 +515,12 @@
                             <type>JSONPATH</type>
                             <parameters>
                                 <parameter>$.body.result.info.version.name</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
                             </parameters>
                         </step>
                     </preprocessing>
@@ -583,6 +643,12 @@
                                         <parameter>0</parameter>
                                     </parameters>
                                 </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <parameters>
+                                        <parameter>24h</parameter>
+                                    </parameters>
+                                </step>
                             </preprocessing>
                             <master_item>
                                 <key>devline.server[camera.state]</key>
@@ -613,6 +679,12 @@
                                     <type>JSONPATH</type>
                                     <parameters>
                                         <parameter>$.data.[{#NUM}].name</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <parameters>
+                                        <parameter>24h</parameter>
                                     </parameters>
                                 </step>
                             </preprocessing>
@@ -660,6 +732,12 @@
                                         <parameter>0</parameter>
                                     </parameters>
                                 </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <parameters>
+                                        <parameter>24h</parameter>
+                                    </parameters>
+                                </step>
                             </preprocessing>
                             <master_item>
                                 <key>devline.server[camera.state]</key>
@@ -703,6 +781,12 @@
                                     <parameters>
                                         <parameter>false</parameter>
                                         <parameter>0</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <parameters>
+                                        <parameter>24h</parameter>
                                     </parameters>
                                 </step>
                             </preprocessing>
@@ -750,6 +834,12 @@
                                         <parameter>0</parameter>
                                     </parameters>
                                 </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <parameters>
+                                        <parameter>24h</parameter>
+                                    </parameters>
+                                </step>
                             </preprocessing>
                             <master_item>
                                 <key>devline.server[camera.state]</key>
@@ -793,6 +883,12 @@
                                     <parameters>
                                         <parameter>false</parameter>
                                         <parameter>0</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <parameters>
+                                        <parameter>24h</parameter>
                                     </parameters>
                                 </step>
                             </preprocessing>
@@ -1166,6 +1262,12 @@ for (i = 0; i &lt; date.length; i++){
 }
 
 return date[3] + &quot;:&quot; + date[4] + &quot;:&quot; + date[5] + &quot;.&quot; + date[6] + &quot; &quot; + date[2] + &quot;.&quot; + date[1] + &quot;.&quot; + date[0];</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <parameters>
+                                        <parameter>24h</parameter>
                                     </parameters>
                                 </step>
                             </preprocessing>

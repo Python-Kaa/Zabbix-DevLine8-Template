@@ -34,6 +34,12 @@
                                 "parameters": [
                                     "$.body.result.version.value"
                                 ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "24h"
+                                ]
                             }
                         ],
                         "url": "http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc",
@@ -220,6 +226,12 @@
                                     "true",
                                     "1"
                                 ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "24h"
+                                ]
                             }
                         ],
                         "master_item": {
@@ -248,6 +260,12 @@
                                 "parameters": [
                                     "$.body.result.info.network.ports.http"
                                 ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "24h"
+                                ]
                             }
                         ],
                         "master_item": {
@@ -275,6 +293,12 @@
                                 "type": "JSONPATH",
                                 "parameters": [
                                     "$.body.result.info.network.ports.main"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "24h"
                                 ]
                             }
                         ],
@@ -306,6 +330,12 @@
                                 "parameters": [
                                     "$.body.result.info.name"
                                 ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "24h"
+                                ]
                             }
                         ],
                         "master_item": {
@@ -336,6 +366,12 @@
                                 "parameters": [
                                     "$.body.result.info.network.ports.ping"
                                 ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "24h"
+                                ]
                             }
                         ],
                         "master_item": {
@@ -363,6 +399,12 @@
                                 "type": "JSONPATH",
                                 "parameters": [
                                     "$.body.result.info.network.ports.rtsp"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "24h"
                                 ]
                             }
                         ],
@@ -394,6 +436,12 @@
                                 "parameters": [
                                     "$.body.result.info.target"
                                 ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "24h"
+                                ]
                             }
                         ],
                         "master_item": {
@@ -424,6 +472,12 @@
                                 "parameters": [
                                     "$.body.result.info.type"
                                 ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "24h"
+                                ]
                             }
                         ],
                         "master_item": {
@@ -453,6 +507,12 @@
                                 "type": "JSONPATH",
                                 "parameters": [
                                     "$.body.result.info.version.name"
+                                ]
+                            },
+                            {
+                                "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                "parameters": [
+                                    "24h"
                                 ]
                             }
                         ],
@@ -571,6 +631,12 @@
                                             "false",
                                             "0"
                                         ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "24h"
+                                        ]
                                     }
                                 ],
                                 "master_item": {
@@ -602,6 +668,12 @@
                                         "type": "JSONPATH",
                                         "parameters": [
                                             "$.data.[{#NUM}].name"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "24h"
                                         ]
                                     }
                                 ],
@@ -648,6 +720,12 @@
                                             "false",
                                             "0"
                                         ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "24h"
+                                        ]
                                     }
                                 ],
                                 "master_item": {
@@ -692,6 +770,12 @@
                                         "parameters": [
                                             "false",
                                             "0"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "24h"
                                         ]
                                     }
                                 ],
@@ -738,6 +822,12 @@
                                             "false",
                                             "0"
                                         ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "24h"
+                                        ]
                                     }
                                 ],
                                 "master_item": {
@@ -782,6 +872,12 @@
                                         "parameters": [
                                             "false",
                                             "0"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "24h"
                                         ]
                                     }
                                 ],
@@ -1142,6 +1238,12 @@
                                         "type": "JAVASCRIPT",
                                         "parameters": [
                                             "if (value == \"-\"){\n   return \"OK\";\n}\n\ndate = value.split(',');\n\nfor (i = 0; i < date.length; i++){\n   if (date[i] < 10){\n      date[i] = \"0\" + date[i];\n   }\n}\n\nreturn date[3] + \":\" + date[4] + \":\" + date[5] + \".\" + date[6] + \" \" + date[2] + \".\" + date[1] + \".\" + date[0];"
+                                        ]
+                                    },
+                                    {
+                                        "type": "DISCARD_UNCHANGED_HEARTBEAT",
+                                        "parameters": [
+                                            "24h"
                                         ]
                                     }
                                 ],

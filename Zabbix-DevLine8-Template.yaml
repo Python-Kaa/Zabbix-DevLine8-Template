@@ -23,6 +23,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.body.result.version.value
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           url: 'http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc'
           status_codes: ''
           post_type: JSON
@@ -156,6 +159,9 @@ zabbix_export:
               parameters:
                 - 'true'
                 - '1'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           master_item:
             key: 'devline.server[features.all]'
           tags:
@@ -172,6 +178,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.body.result.info.network.ports.http
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           master_item:
             key: 'devline.server[features.all]'
           tags:
@@ -188,6 +197,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.body.result.info.network.ports.main
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           master_item:
             key: 'devline.server[features.all]'
           tags:
@@ -206,6 +218,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.body.result.info.name
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           master_item:
             key: 'devline.server[features.all]'
           tags:
@@ -224,6 +239,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.body.result.info.network.ports.ping
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           master_item:
             key: 'devline.server[features.all]'
           tags:
@@ -240,6 +258,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.body.result.info.network.ports.rtsp
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           master_item:
             key: 'devline.server[features.all]'
           tags:
@@ -258,6 +279,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.body.result.info.target
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           master_item:
             key: 'devline.server[features.all]'
           tags:
@@ -276,6 +300,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.body.result.info.type
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           master_item:
             key: 'devline.server[features.all]'
           tags:
@@ -294,6 +321,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.body.result.info.version.name
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           master_item:
             key: 'devline.server[features.all]'
           tags:
@@ -372,6 +402,9 @@ zabbix_export:
                   parameters:
                     - 'false'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
               master_item:
                 key: 'devline.server[camera.state]'
               tags:
@@ -392,6 +425,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$.data.[{#NUM}].name'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
               master_item:
                 key: 'devline.server[camera.all]'
               tags:
@@ -418,6 +454,9 @@ zabbix_export:
                   parameters:
                     - 'false'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
               master_item:
                 key: 'devline.server[camera.state]'
               tags:
@@ -444,6 +483,9 @@ zabbix_export:
                   parameters:
                     - 'false'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
               master_item:
                 key: 'devline.server[camera.state]'
               tags:
@@ -470,6 +512,9 @@ zabbix_export:
                   parameters:
                     - 'false'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
               master_item:
                 key: 'devline.server[camera.state]'
               tags:
@@ -496,6 +541,9 @@ zabbix_export:
                   parameters:
                     - 'false'
                     - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
               master_item:
                 key: 'devline.server[camera.state]'
               tags:
@@ -723,6 +771,9 @@ zabbix_export:
                       }
                       
                       return date[3] + ":" + date[4] + ":" + date[5] + "." + date[6] + " " + date[2] + "." + date[1] + "." + date[0];
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
               master_item:
                 key: 'devline.server[storage.state]'
               tags:
