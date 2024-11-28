@@ -1671,19 +1671,7 @@
                                     {
                                         "uuid": "a2cf884c1f134133994937280beea8b7",
                                         "expression": "find(/DevLine 8.3/devline.server[storage.{#PATH}.write.error],,,\"OK\")=0",
-                                        "name": "\u041e\u0448\u0438\u0431\u043a\u0430 \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH} (eq)",
-                                        "priority": "HIGH"
-                                    },
-                                    {
-                                        "uuid": "f2e8c1963e934002b0a880b27b6a6b05",
-                                        "expression": "find(/DevLine 8.3/devline.server[storage.{#PATH}.write.error],,\"like\",\"OK\")=0",
-                                        "name": "\u041e\u0448\u0438\u0431\u043a\u0430 \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH} (like)",
-                                        "priority": "HIGH"
-                                    },
-                                    {
-                                        "uuid": "8a93413737da40cc8020e8646b2e4399",
-                                        "expression": "find(/DevLine 8.3/devline.server[storage.{#PATH}.write.error],,\"ne\",\"OK\")=1",
-                                        "name": "\u041e\u0448\u0438\u0431\u043a\u0430 \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH} (ne)",
+                                        "name": "\u041e\u0448\u0438\u0431\u043a\u0430 \u0432 \u0445\u0440\u0430\u043d\u0438\u043b\u0438\u0449\u0435 {#PATH}",
                                         "priority": "HIGH"
                                     }
                                 ]

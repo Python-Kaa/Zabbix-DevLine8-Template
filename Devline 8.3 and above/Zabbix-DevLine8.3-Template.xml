@@ -1702,19 +1702,7 @@ return date[3] + &quot;:&quot; + date[4] + &quot;:&quot; + date[5] + &quot;.&quo
                                 <trigger_prototype>
                                     <uuid>a2cf884c1f134133994937280beea8b7</uuid>
                                     <expression>find(/DevLine 8.3/devline.server[storage.{#PATH}.write.error],,,&quot;OK&quot;)=0</expression>
-                                    <name>Ошибка в хранилище {#PATH} (eq)</name>
-                                    <priority>HIGH</priority>
-                                </trigger_prototype>
-                                <trigger_prototype>
-                                    <uuid>f2e8c1963e934002b0a880b27b6a6b05</uuid>
-                                    <expression>find(/DevLine 8.3/devline.server[storage.{#PATH}.write.error],,&quot;like&quot;,&quot;OK&quot;)=0</expression>
-                                    <name>Ошибка в хранилище {#PATH} (like)</name>
-                                    <priority>HIGH</priority>
-                                </trigger_prototype>
-                                <trigger_prototype>
-                                    <uuid>8a93413737da40cc8020e8646b2e4399</uuid>
-                                    <expression>find(/DevLine 8.3/devline.server[storage.{#PATH}.write.error],,&quot;ne&quot;,&quot;OK&quot;)=1</expression>
-                                    <name>Ошибка в хранилище {#PATH} (ne)</name>
+                                    <name>Ошибка в хранилище {#PATH}</name>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
                             </trigger_prototypes>
