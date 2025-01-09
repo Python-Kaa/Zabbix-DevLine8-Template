@@ -4,17 +4,123 @@ zabbix_export:
     - uuid: 7df96b18c230490a9a0a9e2307226338
       name: Templates
   templates:
-    - uuid: 59d97b02f4974f8baaba574f7c6d5d75
-      template: 'DevLine 8.3'
-      name: 'DevLine 8.3'
+    - uuid: 2bd6d6a3d51144a2b8cf59ac8cea9a14
+      template: 'DevLine 8'
+      name: 'DevLine 8'
       description: 'Если проверка web-сервисов на 80 порт проходит, а на другие нет - настраивать или отключать SELinux на сервере или прокси (откуда там у запросы будут идти)'
       groups:
         - name: Templates
       items:
-        - uuid: 56bdfbc69f1741f595b4e6cb3058efda
+        - uuid: 71338a8714224912b60e513adb4f2b88
+          name: 'DevLine - Список камер'
+          type: HTTP_AGENT
+          key: devline.camera.list
+          delay: 3h
+          value_type: CHAR
+          trends: '0'
+          authtype: DIGEST
+          username: '{$DEVLINE_LOGIN}'
+          password: '{$DEVLINE_PASSWORD}'
+          preprocessing:
+            - type: STR_REPLACE
+              parameters:
+                - '"body"'
+                - '"data"'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          url: 'http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/cameras'
+          status_codes: ''
+          headers:
+            - name: Accept
+              value: application/json
+            - name: Content-Type
+              value: application/json
+          output_format: JSON
+          tags:
+            - tag: Service
+              value: DevLine
+        - uuid: f9048fbb00224066839f3a770d5279da
+          name: 'DevLine - Состояние камер'
+          type: HTTP_AGENT
+          key: devline.camera.state
+          delay: 5m
+          value_type: CHAR
+          trends: '0'
+          authtype: DIGEST
+          username: '{$DEVLINE_LOGIN}'
+          password: '{$DEVLINE_PASSWORD}'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          url: 'http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc'
+          status_codes: ''
+          post_type: JSON
+          posts: |
+            {
+               "method" : "monitoring.get_media_state",
+               "version" : {$DEVLINE_API_VER}
+            }
+          headers:
+            - name: Accept
+              value: application/json
+            - name: Content-Type
+              value: application/json
+          request_method: POST
+          output_format: JSON
+          tags:
+            - tag: Service
+              value: DevLine
+          triggers:
+            - uuid: ee7ef1089efc4dc1827c09317d904fbf
+              expression: 'find(/DevLine 8/devline.camera.state,,"like","\"message\" : \"forbidden\"")=1'
+              name: 'DevLine - Forbidden'
+              priority: HIGH
+              description: 'Сервер вернул ошибку о том, что у пользователя недостаточно прав. Нужно проверить наличие права Администрирование -> Просмотр мониторинга'
+            - uuid: 7553f56f805e4d5a8772a099cfa8e631
+              expression: 'last(/DevLine 8/devline.camera.state)="{\"body\":\"<HTML><HEAD><TITLE>401 - Unauthorized</TITLE></HEAD><BODY><H1>401 - Unauthorized</H1><P></P></BODY></HTML>\"}"'
+              name: 'DevLine - User Unauthorized'
+              priority: HIGH
+              description: 'Сервер не нашел у себя пользователя с указанными именем и паролем'
+        - uuid: 35379382ca5c4c7a97fea767ba3c183a
+          name: 'DevLine - Данные сервера'
+          type: HTTP_AGENT
+          key: devline.server.all_features
+          delay: 3h
+          value_type: CHAR
+          trends: '0'
+          authtype: DIGEST
+          username: '{$DEVLINE_LOGIN}'
+          password: '{$DEVLINE_PASSWORD}'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          url: 'http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc'
+          status_codes: ''
+          post_type: JSON
+          posts: |
+            {
+               "method" : "get_server_info",
+               "version" : {$DEVLINE_API_VER}
+            }
+          headers:
+            - name: Accept
+              value: application/json
+            - name: Content-Type
+              value: application/json
+          request_method: POST
+          output_format: JSON
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: 6d7746132c2049b0807ffa0112719205
           name: 'DevLine - Версия API'
           type: HTTP_AGENT
-          key: 'devline.server[api_ver]'
+          key: devline.server.api_version
           delay: 3h
           authtype: DIGEST
           username: '{$DEVLINE_LOGIN}'
@@ -45,10 +151,718 @@ zabbix_export:
               value: Inventory
             - tag: Service
               value: DevLine
+        - uuid: a0f47292dc004276b4eabdc8fd4c487f
+          name: 'DevLine - Demo State'
+          type: DEPENDENT
+          key: devline.server.demo_state
+          delay: '0'
+          valuemap:
+            name: 'DevLine Demo State'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.demo
+            - type: STR_REPLACE
+              parameters:
+                - 'false'
+                - '0'
+            - type: STR_REPLACE
+              parameters:
+                - 'true'
+                - '1'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: 6c4358d9f1224bc1b5ce1b432ea6858f
+          name: 'DevLine - Server Name'
+          type: DEPENDENT
+          key: devline.server.name
+          delay: '0'
+          value_type: CHAR
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.name
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: 00f7204007fd45ce96c4e50a5c1b4dc2
+          name: 'DevLine - HTTP port'
+          type: DEPENDENT
+          key: 'devline.server.port[http]'
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.network.ports.http
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: e2a1b8880b6a4180886566b681e5d0e0
+          name: 'DevLine - Main port'
+          type: DEPENDENT
+          key: 'devline.server.port[main]'
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.network.ports.main
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: 9b2fd14125074329bd68738ba8be094b
+          name: 'DevLine - Ping port'
+          type: DEPENDENT
+          key: 'devline.server.port[ping]'
+          delay: '0'
+          value_type: CHAR
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.network.ports.ping
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: 9d9d749a7bfd41cf9fcd180f79fdde93
+          name: 'DevLine - RTSP port'
+          type: DEPENDENT
+          key: 'devline.server.port[rtsp]'
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.network.ports.rtsp
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: 203bd087310446ae9af3a2691527d179
+          name: 'DevLine - Server Target'
+          type: DEPENDENT
+          key: devline.server.target
+          delay: '0'
+          value_type: CHAR
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.target
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: 2e6ef4863e1c4787b2002517edff5272
+          name: 'DevLine - Server type'
+          type: DEPENDENT
+          key: devline.server.type
+          delay: '0'
+          value_type: CHAR
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.type
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: 0ab6647cccce4e1a916255b1d19a16f2
+          name: 'DevLine - Server Version'
+          type: DEPENDENT
+          key: devline.server.version
+          delay: '0'
+          value_type: CHAR
+          trends: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.version.name
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+          triggers:
+            - uuid: d68f7a0a4fe14aa3acbca8c2d5af544c
+              expression: 'last(/DevLine 8/devline.server.version,#2)<>last(/DevLine 8/devline.server.version)'
+              name: 'DevLine Version was changed'
+              priority: INFO
+              manual_close: 'YES'
+        - uuid: 1ce3cd6f45ce43df8d1aea529a9a03b9
+          name: 'DevLine - Хранилища'
+          type: HTTP_AGENT
+          key: devline.storage.list
+          delay: 5m
+          value_type: CHAR
+          trends: '0'
+          authtype: DIGEST
+          username: '{$DEVLINE_LOGIN}'
+          password: '{$DEVLINE_PASSWORD}'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.state
+            - type: STR_REPLACE
+              parameters:
+                - '{"storages":['
+                - '{"data":['
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          url: 'http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc'
+          status_codes: ''
+          post_type: JSON
+          posts: |
+            {
+               "method" : "monitoring.get_archive_state",
+               "version" : {$DEVLINE_API_VER}
+            }
+          headers:
+            - name: Accept
+              value: application/json
+            - name: Content-Type
+              value: application/json
+          request_method: POST
+          output_format: JSON
+          tags:
+            - tag: Application
+              value: Storage
+            - tag: Service
+              value: DevLine
+      discovery_rules:
+        - uuid: 9621463e20e44d16880de7b3c2c708bd
+          name: 'Camera discovery'
+          type: DEPENDENT
+          key: devline.camera.discovery
+          delay: '0'
+          lifetime: 5d
+          item_prototypes:
+            - uuid: 1a47f2db27f74ddca3110187cb29483d
+              name: 'Devline - {#NAME} Admin State'
+              type: DEPENDENT
+              key: 'devline.camera.admin_state[{#NUM},camera]'
+              delay: '0'
+              valuemap:
+                name: 'Devline Camera Admin State'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.body.result.state.cameras.{#NUM}.enabled'
+                - type: STR_REPLACE
+                  parameters:
+                    - 'true'
+                    - '1'
+                - type: STR_REPLACE
+                  parameters:
+                    - 'false'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
+              master_item:
+                key: devline.camera.state
+              tags:
+                - tag: Camera
+                  value: '{#NAME}'
+                - tag: Service
+                  value: DevLine
+            - uuid: 4d3dfb1988ca4703a62938a7a61db551
+              name: 'Devline - {#NAME} Stream1 Admin State'
+              type: DEPENDENT
+              key: 'devline.camera.admin_state[{#NUM},stream1]'
+              delay: '0'
+              valuemap:
+                name: 'Devline Camera Admin State'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.body.result.state.cameras.{#NUM}.streams.video.enabled'
+                - type: STR_REPLACE
+                  parameters:
+                    - 'true'
+                    - '1'
+                - type: STR_REPLACE
+                  parameters:
+                    - 'false'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
+              master_item:
+                key: devline.camera.state
+              tags:
+                - tag: Camera
+                  value: '{#NAME}'
+                - tag: Service
+                  value: DevLine
+                - tag: Video
+                  value: '{#NAME} stream 1'
+            - uuid: 2939cfc5afed4e6d80e7adb040901794
+              name: 'Devline - {#NAME} Stream2 Admin State'
+              type: DEPENDENT
+              key: 'devline.camera.admin_state[{#NUM},stream2]'
+              delay: '0'
+              valuemap:
+                name: 'Devline Camera Admin State'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.body.result.state.cameras.{#NUM}.streams.video2.enabled'
+                - type: STR_REPLACE
+                  parameters:
+                    - 'true'
+                    - '1'
+                - type: STR_REPLACE
+                  parameters:
+                    - 'false'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
+              master_item:
+                key: devline.camera.state
+              tags:
+                - tag: Camera
+                  value: '{#NAME}'
+                - tag: Service
+                  value: DevLine
+                - tag: Video
+                  value: '{#NAME} stream 2'
+            - uuid: c6fed9a1ce7f4e55b926e681c0628eb8
+              name: 'Devline - Camera {#NUM} Name'
+              type: DEPENDENT
+              key: 'devline.camera.name[{#NUM}]'
+              delay: '0'
+              value_type: CHAR
+              trends: '0'
+              status: DISABLED
+              discover: NO_DISCOVER
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.data.[{#NUM}].name'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
+              master_item:
+                key: devline.camera.list
+              tags:
+                - tag: Camera
+                  value: '{#NAME}'
+                - tag: Service
+                  value: DevLine
+            - uuid: ff6cc7576db947ba8627f369b048a678
+              name: 'Devline - {#NAME} Stream1 Status'
+              type: DEPENDENT
+              key: 'devline.camera.status[{#NUM},stream1]'
+              delay: '0'
+              valuemap:
+                name: 'DevLine Stream Status'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.body.result.state.cameras.{#NUM}.streams.video.active'
+                - type: STR_REPLACE
+                  parameters:
+                    - 'true'
+                    - '1'
+                - type: STR_REPLACE
+                  parameters:
+                    - 'false'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
+              master_item:
+                key: devline.camera.state
+              tags:
+                - tag: Camera
+                  value: '{#NAME}'
+                - tag: Service
+                  value: DevLine
+                - tag: Video
+                  value: '{#NAME} stream 1'
+            - uuid: a733e70831b84329ac4c7365b0668387
+              name: 'Devline - {#NAME} Stream2 Status'
+              type: DEPENDENT
+              key: 'devline.camera.status[{#NUM},stream2]'
+              delay: '0'
+              valuemap:
+                name: 'DevLine Stream Status'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.body.result.state.cameras.{#NUM}.streams.video2.active'
+                - type: STR_REPLACE
+                  parameters:
+                    - 'true'
+                    - '1'
+                - type: STR_REPLACE
+                  parameters:
+                    - 'false'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
+              master_item:
+                key: devline.camera.state
+              tags:
+                - tag: Camera
+                  value: '{#NAME}'
+                - tag: Service
+                  value: DevLine
+                - tag: Video
+                  value: '{#NAME} stream 2'
+          trigger_prototypes:
+            - uuid: ed1152ca4d93493f90b347e86667ae8c
+              expression: 'last(/DevLine 8/devline.camera.admin_state[{#NUM},camera])=1 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream1])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream1])=0 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream2])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream2])=0'
+              name: 'DevLine - {#NAME} Fail'
+              opdata: 'Camera - {ITEM.LASTVALUE1}, Stream1 - {ITEM.LASTVALUE3}, Stream2 - {ITEM.LASTVALUE5}'
+              priority: AVERAGE
+              tags:
+                - tag: Camera
+                  value: '{#NAME}'
+            - uuid: f47d5396908e49e88620a23691748abb
+              expression: 'last(/DevLine 8/devline.camera.admin_state[{#NUM},camera])=1 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream1])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream1])=0'
+              name: 'DevLine - {#NAME} Stream1 Fail'
+              opdata: '{ITEM.LASTVALUE3}'
+              priority: WARNING
+              dependencies:
+                - name: 'DevLine - {#NAME} Fail'
+                  expression: 'last(/DevLine 8/devline.camera.admin_state[{#NUM},camera])=1 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream1])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream1])=0 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream2])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream2])=0'
+              tags:
+                - tag: Camera
+                  value: '{#NAME}'
+            - uuid: 468fbf6acf2f4d2780db6d7d73ebc2b9
+              expression: 'last(/DevLine 8/devline.camera.admin_state[{#NUM},camera])=1 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream2])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream2])=0'
+              name: 'DevLine - {#NAME} Stream2 Fail'
+              opdata: '{ITEM.LASTVALUE3}'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                - name: 'DevLine - {#NAME} Fail'
+                  expression: 'last(/DevLine 8/devline.camera.admin_state[{#NUM},camera])=1 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream1])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream1])=0 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream2])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream2])=0'
+              tags:
+                - tag: Camera
+                  value: '{#NAME}'
+          master_item:
+            key: devline.camera.list
+          lld_macro_paths:
+            - lld_macro: '{#NAME}'
+              path: $.name
+            - lld_macro: '{#NUM}'
+              path: $.uri
+          preprocessing:
+            - type: STR_REPLACE
+              parameters:
+                - /cameras/
+                - ''
+        - uuid: 9909a58739014ec2b27cfafd53586e60
+          name: 'Storage discovery'
+          type: DEPENDENT
+          key: devline.storage.discovery
+          delay: '0'
+          lifetime: 14d
+          item_prototypes:
+            - uuid: 5e64e32c19ff42de9104bd00d3ecf058
+              name: 'Devline - Storage {#PATH} free space'
+              type: DEPENDENT
+              key: 'devline.storage.free_space[{#PATH}]'
+              delay: '0'
+              units: b
+              description: 'Объем свободного место в хранилище'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.path == "{#PATH}")].free_space'
+                - type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                - type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+                - type: MULTIPLIER
+                  parameters:
+                    - '1000000'
+              master_item:
+                key: devline.storage.list
+              tags:
+                - tag: Application
+                  value: Storage
+                - tag: Service
+                  value: DevLine
+                - tag: Storage
+                  value: '{#PATH}'
+            - uuid: 71d60ffc0444491188b3d70aa407385c
+              name: 'Devline - Storage {#PATH} state'
+              type: DEPENDENT
+              key: 'devline.storage.state[{#PATH}]'
+              delay: '0'
+              description: 'Флаг доступности хранилища'
+              valuemap:
+                name: 'DevLine Storage Availability'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.path == "{#PATH}")].available'
+                - type: STR_REPLACE
+                  parameters:
+                    - '[true]'
+                    - '1'
+                - type: STR_REPLACE
+                  parameters:
+                    - '[false]'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
+              master_item:
+                key: devline.storage.list
+              tags:
+                - tag: Application
+                  value: Storage
+                - tag: Service
+                  value: DevLine
+                - tag: Storage
+                  value: '{#PATH}'
+              trigger_prototypes:
+                - uuid: ba534f3e460a412b8548034edd088fe1
+                  expression: 'last(/DevLine 8/devline.storage.state[{#PATH}],#2)=0'
+                  name: 'Хранилище {#PATH} недоступно'
+                  priority: HIGH
+            - uuid: c572d58bb66e45768984bf77d7e85c67
+              name: 'Devline - Storage {#PATH} write datarate'
+              type: DEPENDENT
+              key: 'devline.storage.write_datarate[{#PATH}]'
+              delay: '0'
+              value_type: FLOAT
+              units: b/s
+              description: 'Среднее за несколько последних секунд количество байт данных, поступающих на запись в хранилище'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.path == "{#PATH}")].write.datarate'
+                - type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                - type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: devline.storage.list
+              tags:
+                - tag: Application
+                  value: Storage
+                - tag: Service
+                  value: DevLine
+                - tag: Storage
+                  value: '{#PATH}'
+            - uuid: 224125bb59c34ce49bb912346374d0b3
+              name: 'Devline - Storage {#PATH} last error time'
+              type: DEPENDENT
+              key: 'devline.storage.write_error[{#PATH}]'
+              delay: '0'
+              value_type: CHAR
+              trends: '0'
+              description: |
+                Время последней ошибки записи в хранилище в формате [год, месяц, день, час, минута, секунда, миллисекунда]
+                Если элемент не обнаруживается, считаем, что всё хорошо
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.path == "{#PATH}")].last_error_time'
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: '-'
+                - type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                - type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      if (value == "-"){
+                         return "OK";
+                      }
+                      
+                      date = value.split(',');
+                      
+                      for (i = 0; i < date.length; i++){
+                         if (date[i] < 10){
+                            date[i] = "0" + date[i];
+                         }
+                      }
+                      
+                      return date[3] + ":" + date[4] + ":" + date[5] + "." + date[6] + " " + date[2] + "." + date[1] + "." + date[0];
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 24h
+              master_item:
+                key: devline.storage.list
+              tags:
+                - tag: Application
+                  value: Storage
+                - tag: Service
+                  value: DevLine
+                - tag: Storage
+                  value: '{#PATH}'
+              trigger_prototypes:
+                - uuid: 7e888e8fa21347849af33cddb5770780
+                  expression: 'find(/DevLine 8/devline.storage.write_error[{#PATH}],,,"OK")=0'
+                  name: 'Ошибка в хранилище {#PATH}'
+                  priority: HIGH
+            - uuid: 1a3b9983e2134a7baa51c459e4aeca2e
+              name: 'Devline - Storage {#PATH} write queue'
+              type: DEPENDENT
+              key: 'devline.storage.write_queue[{#PATH}]'
+              delay: '0'
+              value_type: FLOAT
+              units: b
+              description: 'Максимальное за несколько последних секунд относительное значение размера очереди записи хранилища от максимально возможного'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.data[?(@.path == "{#PATH}")].write.queue_size'
+                - type: STR_REPLACE
+                  parameters:
+                    - '['
+                    - ''
+                - type: STR_REPLACE
+                  parameters:
+                    - ']'
+                    - ''
+              master_item:
+                key: devline.storage.list
+              tags:
+                - tag: Application
+                  value: Storage
+                - tag: Service
+                  value: DevLine
+                - tag: Storage
+                  value: '{#PATH}'
+          master_item:
+            key: devline.storage.list
+          lld_macro_paths:
+            - lld_macro: '{#PATH}'
+              path: $.path
+      macros:
+        - macro: '{$DEVLINE_API_VER}'
+          value: '79'
+          description: 'На момент написания шаблона актуальная - это 79 версия. Но может быть другой (шаблон точно работает на 45)'
+        - macro: '{$DEVLINE_HTTP_PORT}'
+          value: '9786'
+          description: 'Порт для HTTP-запросов DevLine. По умолчанию - 9786 порт'
+        - macro: '{$DEVLINE_LOGIN}'
+          value: admin
+        - macro: '{$DEVLINE_PASSWORD}'
+          type: SECRET_TEXT
+      valuemaps:
+        - uuid: 7dfff5118d49452ea6fd344ffd3b3853
+          name: 'Devline Camera Admin State'
+          mappings:
+            - value: '1'
+              newvalue: Enabled
+            - value: '0'
+              newvalue: 'Off'
+        - uuid: d4cf65d6b75644dbae012d5542438868
+          name: 'DevLine Demo State'
+          mappings:
+            - value: '1'
+              newvalue: Demo
+            - value: '0'
+              newvalue: Commercial
+        - uuid: 615a7d20b1c64e60bb9679b8af065b13
+          name: 'DevLine Storage Availability'
+          mappings:
+            - value: '1'
+              newvalue: Available
+            - value: '0'
+              newvalue: Fail
+        - uuid: 7cca203cf1dc4a108dd137223d3f57f9
+          name: 'DevLine Stream Status'
+          mappings:
+            - value: '1'
+              newvalue: OK
+            - value: '0'
+              newvalue: Fail
+    - uuid: 59d97b02f4974f8baaba574f7c6d5d75
+      template: 'DevLine 8.3'
+      name: 'DevLine 8.3'
+      description: 'Если проверка web-сервисов на 80 порт проходит, а на другие нет - настраивать или отключать SELinux на сервере или прокси (откуда там у запросы будут идти)'
+      groups:
+        - name: Templates
+      items:
         - uuid: 44056cd8a4ec444cae1b687d7b7726a5
           name: 'DevLine - Список камер'
           type: HTTP_AGENT
-          key: 'devline.server[camera.all]'
+          key: devline.camera.list
           delay: 3h
           value_type: CHAR
           trends: '0'
@@ -74,7 +888,7 @@ zabbix_export:
         - uuid: b237b28bded74684bcc13c37498d97f7
           name: 'DevLine - Состояние камер'
           type: HTTP_AGENT
-          key: 'devline.server[camera.state]'
+          key: devline.camera.state
           delay: 5m
           value_type: CHAR
           trends: '0'
@@ -101,19 +915,19 @@ zabbix_export:
               value: DevLine
           triggers:
             - uuid: 2024681a2ca844559508f0cd2a0b41ff
-              expression: 'find(/DevLine 8.3/devline.server[camera.state],,"like","\"message\" : \"forbidden\"")=1'
+              expression: 'find(/DevLine 8.3/devline.camera.state,,"like","\"message\" : \"forbidden\"")=1'
               name: 'DevLine - Forbidden'
               priority: HIGH
               description: 'Сервер вернул ошибку о том, что у пользователя недостаточно прав. Нужно проверить наличие права Администрирование -> Просмотр мониторинга'
             - uuid: 15abcb1e1f384bd8b127c5be15246743
-              expression: 'last(/DevLine 8.3/devline.server[camera.state])="{\"body\":\"<HTML><HEAD><TITLE>401 - Unauthorized</TITLE></HEAD><BODY><H1>401 - Unauthorized</H1><P></P></BODY></HTML>\"}"'
+              expression: 'last(/DevLine 8.3/devline.camera.state)="{\"body\":\"<HTML><HEAD><TITLE>401 - Unauthorized</TITLE></HEAD><BODY><H1>401 - Unauthorized</H1><P></P></BODY></HTML>\"}"'
               name: 'DevLine - User Unauthorized'
               priority: HIGH
               description: 'Сервер не нашел у себя пользователя с указанными именем и паролем'
         - uuid: 5ff8866bce324232ab829ea7c9a926e6
           name: 'DevLine - Данные сервера'
           type: HTTP_AGENT
-          key: 'devline.server[features.all]'
+          key: devline.server.all_features
           delay: 3h
           value_type: CHAR
           trends: '0'
@@ -140,10 +954,44 @@ zabbix_export:
               value: Inventory
             - tag: Service
               value: DevLine
+        - uuid: 56bdfbc69f1741f595b4e6cb3058efda
+          name: 'DevLine - Версия API'
+          type: HTTP_AGENT
+          key: devline.server.api_version
+          delay: 3h
+          authtype: DIGEST
+          username: '{$DEVLINE_LOGIN}'
+          password: '{$DEVLINE_PASSWORD}'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.version.value
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          url: 'http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc'
+          status_codes: ''
+          post_type: JSON
+          posts: |
+            {
+               "method" : "get_version"
+            }
+          headers:
+            - name: Accept
+              value: application/json
+            - name: Content-Type
+              value: application/json
+          request_method: POST
+          output_format: JSON
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
         - uuid: 1ce1b98e78e94f47890f9ef1a592cf4c
           name: 'DevLine - Demo State'
           type: DEPENDENT
-          key: 'devline.server[features.demo]'
+          key: devline.server.demo_state
           delay: '0'
           valuemap:
             name: 'DevLine Demo State'
@@ -163,26 +1011,7 @@ zabbix_export:
               parameters:
                 - 24h
           master_item:
-            key: 'devline.server[features.all]'
-          tags:
-            - tag: Application
-              value: Inventory
-            - tag: Service
-              value: DevLine
-        - uuid: 840c0b2e5ebb43b59639d8b223ae3677
-          name: 'DevLine - HTTP port'
-          type: DEPENDENT
-          key: 'devline.server[features.http]'
-          delay: '0'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.body.result.info.network.ports.http
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 24h
-          master_item:
-            key: 'devline.server[features.all]'
+            key: devline.server.all_features
           tags:
             - tag: Application
               value: Inventory
@@ -191,7 +1020,7 @@ zabbix_export:
         - uuid: 4c72153cf2704c94982ef0f5034bf8a6
           name: 'DevLine - Server ID'
           type: DEPENDENT
-          key: 'devline.server[features.id]'
+          key: devline.server.id
           delay: '0'
           value_type: CHAR
           trends: '0'
@@ -203,7 +1032,7 @@ zabbix_export:
               parameters:
                 - 24h
           master_item:
-            key: 'devline.server[features.all]'
+            key: devline.server.all_features
           tags:
             - tag: Application
               value: Inventory
@@ -211,32 +1040,13 @@ zabbix_export:
               value: DevLine
           triggers:
             - uuid: cf97cef6bb814d23b30f512af596d24c
-              expression: 'change(/DevLine 8.3/devline.server[features.id])=1'
+              expression: 'change(/DevLine 8.3/devline.server.id)=1'
               name: 'Devline Server replaced'
               priority: INFO
-        - uuid: d783c741db11401eb08bff3a7726f14f
-          name: 'DevLine - Main port'
-          type: DEPENDENT
-          key: 'devline.server[features.main]'
-          delay: '0'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.body.result.info.network.ports.main
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 24h
-          master_item:
-            key: 'devline.server[features.all]'
-          tags:
-            - tag: Application
-              value: Inventory
-            - tag: Service
-              value: DevLine
         - uuid: ffc9d64d1aaa41c3bdd0622a87aa8cb7
           name: 'DevLine - Server Model'
           type: DEPENDENT
-          key: 'devline.server[features.model]'
+          key: devline.server.model
           delay: '0'
           value_type: CHAR
           trends: '0'
@@ -250,7 +1060,7 @@ zabbix_export:
               parameters:
                 - 24h
           master_item:
-            key: 'devline.server[features.all]'
+            key: devline.server.all_features
           tags:
             - tag: Application
               value: Inventory
@@ -259,7 +1069,7 @@ zabbix_export:
         - uuid: 820099e7b56b4131b1c1886b2f180b01
           name: 'DevLine - Server Name'
           type: DEPENDENT
-          key: 'devline.server[features.name]'
+          key: devline.server.name
           delay: '0'
           value_type: CHAR
           trends: '0'
@@ -271,7 +1081,45 @@ zabbix_export:
               parameters:
                 - 24h
           master_item:
-            key: 'devline.server[features.all]'
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: 840c0b2e5ebb43b59639d8b223ae3677
+          name: 'DevLine - HTTP port'
+          type: DEPENDENT
+          key: 'devline.server.port[http]'
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.network.ports.http
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
+          tags:
+            - tag: Application
+              value: Inventory
+            - tag: Service
+              value: DevLine
+        - uuid: d783c741db11401eb08bff3a7726f14f
+          name: 'DevLine - Main port'
+          type: DEPENDENT
+          key: 'devline.server.port[main]'
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.body.result.info.network.ports.main
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
+          master_item:
+            key: devline.server.all_features
           tags:
             - tag: Application
               value: Inventory
@@ -280,7 +1128,7 @@ zabbix_export:
         - uuid: 9a44f51bfeec4b60b26a6be01eb66eb4
           name: 'DevLine - Ping port'
           type: DEPENDENT
-          key: 'devline.server[features.ping]'
+          key: 'devline.server.port[ping]'
           delay: '0'
           value_type: CHAR
           trends: '0'
@@ -292,7 +1140,7 @@ zabbix_export:
               parameters:
                 - 24h
           master_item:
-            key: 'devline.server[features.all]'
+            key: devline.server.all_features
           tags:
             - tag: Application
               value: Inventory
@@ -301,7 +1149,7 @@ zabbix_export:
         - uuid: 742bc6572b5641dbb91bcf7bc3ba0d02
           name: 'DevLine - RTSP port'
           type: DEPENDENT
-          key: 'devline.server[features.rtsp]'
+          key: 'devline.server.port[rtsp]'
           delay: '0'
           preprocessing:
             - type: JSONPATH
@@ -311,7 +1159,7 @@ zabbix_export:
               parameters:
                 - 24h
           master_item:
-            key: 'devline.server[features.all]'
+            key: devline.server.all_features
           tags:
             - tag: Application
               value: Inventory
@@ -320,7 +1168,7 @@ zabbix_export:
         - uuid: 8338928e243e4a36b238ae60147d227b
           name: 'DevLine - Server Target'
           type: DEPENDENT
-          key: 'devline.server[features.target]'
+          key: devline.server.target
           delay: '0'
           value_type: CHAR
           trends: '0'
@@ -332,7 +1180,7 @@ zabbix_export:
               parameters:
                 - 24h
           master_item:
-            key: 'devline.server[features.all]'
+            key: devline.server.all_features
           tags:
             - tag: Application
               value: Inventory
@@ -341,7 +1189,7 @@ zabbix_export:
         - uuid: 85c0ea7cf3bd4747aecbcf10a578b612
           name: 'DevLine - Server type'
           type: DEPENDENT
-          key: 'devline.server[features.type]'
+          key: devline.server.type
           delay: '0'
           value_type: CHAR
           trends: '0'
@@ -353,7 +1201,7 @@ zabbix_export:
               parameters:
                 - 24h
           master_item:
-            key: 'devline.server[features.all]'
+            key: devline.server.all_features
           tags:
             - tag: Application
               value: Inventory
@@ -362,7 +1210,7 @@ zabbix_export:
         - uuid: e2e96253d45048868def6307ff86c84f
           name: 'DevLine - Server Version'
           type: DEPENDENT
-          key: 'devline.server[features.version]'
+          key: devline.server.version
           delay: '0'
           value_type: CHAR
           trends: '0'
@@ -374,7 +1222,7 @@ zabbix_export:
               parameters:
                 - 24h
           master_item:
-            key: 'devline.server[features.all]'
+            key: devline.server.all_features
           tags:
             - tag: Application
               value: Inventory
@@ -382,14 +1230,14 @@ zabbix_export:
               value: DevLine
           triggers:
             - uuid: 3d2ea49cd42240e89f495e75987442a7
-              expression: 'last(/DevLine 8.3/devline.server[features.version],#2)<>last(/DevLine 8.3/devline.server[features.version])'
+              expression: 'last(/DevLine 8.3/devline.server.version,#2)<>last(/DevLine 8.3/devline.server.version)'
               name: 'DevLine Version was changed'
               priority: INFO
               manual_close: 'YES'
         - uuid: 167f28f6acfd4af5826b2ca99a47ef19
           name: 'DevLine - Хранилища'
           type: HTTP_AGENT
-          key: 'devline.server[storage.state]'
+          key: devline.storage.list
           delay: 5m
           value_type: CHAR
           trends: '0'
@@ -453,7 +1301,7 @@ zabbix_export:
                   parameters:
                     - 24h
               master_item:
-                key: 'devline.server[camera.state]'
+                key: devline.camera.state
               tags:
                 - tag: Camera
                   value: '{#NAME}'
@@ -476,7 +1324,7 @@ zabbix_export:
                   parameters:
                     - 24h
               master_item:
-                key: 'devline.server[camera.all]'
+                key: devline.camera.list
               tags:
                 - tag: Camera
                   value: '{#NAME}'
@@ -535,7 +1383,7 @@ zabbix_export:
                   parameters:
                     - 24h
               master_item:
-                key: 'devline.server[camera.state]'
+                key: devline.camera.state
               tags:
                 - tag: Camera
                   value: '{#NAME}'
@@ -632,7 +1480,7 @@ zabbix_export:
                   parameters:
                     - 24h
               master_item:
-                key: 'devline.server[camera.state]'
+                key: devline.camera.state
               tags:
                 - tag: Camera
                   value: '{#NAME}'
@@ -663,7 +1511,7 @@ zabbix_export:
                   parameters:
                     - 24h
               master_item:
-                key: 'devline.server[camera.state]'
+                key: devline.camera.state
               tags:
                 - tag: Camera
                   value: '{#NAME}'
@@ -760,7 +1608,7 @@ zabbix_export:
                   parameters:
                     - 24h
               master_item:
-                key: 'devline.server[camera.state]'
+                key: devline.camera.state
               tags:
                 - tag: Camera
                   value: '{#NAME}'
@@ -826,7 +1674,7 @@ zabbix_export:
                 - tag: Camera
                   value: '{#NAME}'
           master_item:
-            key: 'devline.server[camera.all]'
+            key: devline.camera.list
           lld_macro_paths:
             - lld_macro: '{#NAME}'
               path: $.name
@@ -868,7 +1716,7 @@ zabbix_export:
                   parameters:
                     - 24h
               master_item:
-                key: 'devline.server[storage.state]'
+                key: devline.storage.list
               tags:
                 - tag: Application
                   value: Storage
@@ -883,8 +1731,6 @@ zabbix_export:
               delay: '0'
               units: b
               description: 'Объем свободного место в хранилище'
-              valuemap:
-                name: 'DevLine Storage Availability'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -901,7 +1747,7 @@ zabbix_export:
                   parameters:
                     - '1000000'
               master_item:
-                key: 'devline.server[storage.state]'
+                key: devline.storage.list
               tags:
                 - tag: Application
                   value: Storage
@@ -933,7 +1779,7 @@ zabbix_export:
                   parameters:
                     - 24h
               master_item:
-                key: 'devline.server[storage.state]'
+                key: devline.storage.list
               tags:
                 - tag: Application
                   value: Storage
@@ -967,7 +1813,7 @@ zabbix_export:
                     - ']'
                     - ''
               master_item:
-                key: 'devline.server[storage.state]'
+                key: devline.storage.list
               tags:
                 - tag: Application
                   value: Storage
@@ -1019,7 +1865,7 @@ zabbix_export:
                   parameters:
                     - 24h
               master_item:
-                key: 'devline.server[storage.state]'
+                key: devline.storage.list
               tags:
                 - tag: Application
                   value: Storage
@@ -1053,7 +1899,7 @@ zabbix_export:
                     - ']'
                     - ''
               master_item:
-                key: 'devline.server[storage.state]'
+                key: devline.storage.list
               tags:
                 - tag: Application
                   value: Storage
@@ -1062,7 +1908,7 @@ zabbix_export:
                 - tag: Storage
                   value: '{#PATH}'
           master_item:
-            key: 'devline.server[storage.state]'
+            key: devline.storage.list
           lld_macro_paths:
             - lld_macro: '{#PATH}'
               path: $.path
