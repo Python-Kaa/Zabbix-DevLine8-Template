@@ -20,10 +20,166 @@
             </groups>
             <items>
                 <item>
+                    <uuid>71338a8714224912b60e513adb4f2b88</uuid>
+                    <name>DevLine - Список камер</name>
+                    <type>HTTP_AGENT</type>
+                    <key>devline.camera.list</key>
+                    <delay>3h</delay>
+                    <value_type>CHAR</value_type>
+                    <trends>0</trends>
+                    <authtype>DIGEST</authtype>
+                    <username>{$DEVLINE_LOGIN}</username>
+                    <password>{$DEVLINE_PASSWORD}</password>
+                    <preprocessing>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <parameters>
+                                <parameter>&quot;body&quot;</parameter>
+                                <parameter>&quot;data&quot;</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <url>http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/cameras</url>
+                    <status_codes/>
+                    <headers>
+                        <header>
+                            <name>Accept</name>
+                            <value>application/json</value>
+                        </header>
+                        <header>
+                            <name>Content-Type</name>
+                            <value>application/json</value>
+                        </header>
+                    </headers>
+                    <output_format>JSON</output_format>
+                    <tags>
+                        <tag>
+                            <tag>Service</tag>
+                            <value>DevLine</value>
+                        </tag>
+                    </tags>
+                </item>
+                <item>
+                    <uuid>f9048fbb00224066839f3a770d5279da</uuid>
+                    <name>DevLine - Состояние камер</name>
+                    <type>HTTP_AGENT</type>
+                    <key>devline.camera.state</key>
+                    <delay>5m</delay>
+                    <value_type>CHAR</value_type>
+                    <trends>0</trends>
+                    <authtype>DIGEST</authtype>
+                    <username>{$DEVLINE_LOGIN}</username>
+                    <password>{$DEVLINE_PASSWORD}</password>
+                    <preprocessing>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <url>http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc</url>
+                    <status_codes/>
+                    <post_type>JSON</post_type>
+                    <posts>{
+   &quot;method&quot; : &quot;monitoring.get_media_state&quot;,
+   &quot;version&quot; : {$DEVLINE_API_VER}
+}</posts>
+                    <headers>
+                        <header>
+                            <name>Accept</name>
+                            <value>application/json</value>
+                        </header>
+                        <header>
+                            <name>Content-Type</name>
+                            <value>application/json</value>
+                        </header>
+                    </headers>
+                    <request_method>POST</request_method>
+                    <output_format>JSON</output_format>
+                    <tags>
+                        <tag>
+                            <tag>Service</tag>
+                            <value>DevLine</value>
+                        </tag>
+                    </tags>
+                    <triggers>
+                        <trigger>
+                            <uuid>ee7ef1089efc4dc1827c09317d904fbf</uuid>
+                            <expression>find(/DevLine 8/devline.camera.state,,&quot;like&quot;,&quot;\&quot;message\&quot; : \&quot;forbidden\&quot;&quot;)=1</expression>
+                            <name>DevLine - Forbidden</name>
+                            <priority>HIGH</priority>
+                            <description>Сервер вернул ошибку о том, что у пользователя недостаточно прав. Нужно проверить наличие права Администрирование -&gt; Просмотр мониторинга</description>
+                        </trigger>
+                        <trigger>
+                            <uuid>7553f56f805e4d5a8772a099cfa8e631</uuid>
+                            <expression>last(/DevLine 8/devline.camera.state)=&quot;{\&quot;body\&quot;:\&quot;&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;401 - Unauthorized&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;&lt;H1&gt;401 - Unauthorized&lt;/H1&gt;&lt;P&gt;&lt;/P&gt;&lt;/BODY&gt;&lt;/HTML&gt;\&quot;}&quot;</expression>
+                            <name>DevLine - User Unauthorized</name>
+                            <priority>HIGH</priority>
+                            <description>Сервер не нашел у себя пользователя с указанными именем и паролем</description>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <uuid>35379382ca5c4c7a97fea767ba3c183a</uuid>
+                    <name>DevLine - Данные сервера</name>
+                    <type>HTTP_AGENT</type>
+                    <key>devline.server.all_features</key>
+                    <delay>3h</delay>
+                    <value_type>CHAR</value_type>
+                    <trends>0</trends>
+                    <authtype>DIGEST</authtype>
+                    <username>{$DEVLINE_LOGIN}</username>
+                    <password>{$DEVLINE_PASSWORD}</password>
+                    <preprocessing>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <url>http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc</url>
+                    <status_codes/>
+                    <post_type>JSON</post_type>
+                    <posts>{
+   &quot;method&quot; : &quot;get_server_info&quot;,
+   &quot;version&quot; : {$DEVLINE_API_VER}
+}</posts>
+                    <headers>
+                        <header>
+                            <name>Accept</name>
+                            <value>application/json</value>
+                        </header>
+                        <header>
+                            <name>Content-Type</name>
+                            <value>application/json</value>
+                        </header>
+                    </headers>
+                    <request_method>POST</request_method>
+                    <output_format>JSON</output_format>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>Inventory</value>
+                        </tag>
+                        <tag>
+                            <tag>Service</tag>
+                            <value>DevLine</value>
+                        </tag>
+                    </tags>
+                </item>
+                <item>
                     <uuid>6d7746132c2049b0807ffa0112719205</uuid>
                     <name>DevLine - Версия API</name>
                     <type>HTTP_AGENT</type>
-                    <key>devline.server[api_ver]</key>
+                    <key>devline.server.api_version</key>
                     <delay>3h</delay>
                     <authtype>DIGEST</authtype>
                     <username>{$DEVLINE_LOGIN}</username>
@@ -72,144 +228,10 @@
                     </tags>
                 </item>
                 <item>
-                    <uuid>71338a8714224912b60e513adb4f2b88</uuid>
-                    <name>DevLine - Список камер</name>
-                    <type>HTTP_AGENT</type>
-                    <key>devline.server[camera.all]</key>
-                    <delay>3h</delay>
-                    <value_type>CHAR</value_type>
-                    <trends>0</trends>
-                    <authtype>DIGEST</authtype>
-                    <username>{$DEVLINE_LOGIN}</username>
-                    <password>{$DEVLINE_PASSWORD}</password>
-                    <preprocessing>
-                        <step>
-                            <type>STR_REPLACE</type>
-                            <parameters>
-                                <parameter>&quot;body&quot;</parameter>
-                                <parameter>&quot;data&quot;</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <url>http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/cameras</url>
-                    <status_codes/>
-                    <headers>
-                        <header>
-                            <name>Accept</name>
-                            <value>application/json</value>
-                        </header>
-                        <header>
-                            <name>Content-Type</name>
-                            <value>application/json</value>
-                        </header>
-                    </headers>
-                    <output_format>JSON</output_format>
-                    <tags>
-                        <tag>
-                            <tag>Service</tag>
-                            <value>DevLine</value>
-                        </tag>
-                    </tags>
-                </item>
-                <item>
-                    <uuid>f9048fbb00224066839f3a770d5279da</uuid>
-                    <name>DevLine - Состояние камер</name>
-                    <type>HTTP_AGENT</type>
-                    <key>devline.server[camera.state]</key>
-                    <delay>5m</delay>
-                    <value_type>CHAR</value_type>
-                    <trends>0</trends>
-                    <authtype>DIGEST</authtype>
-                    <username>{$DEVLINE_LOGIN}</username>
-                    <password>{$DEVLINE_PASSWORD}</password>
-                    <url>http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc</url>
-                    <status_codes/>
-                    <post_type>JSON</post_type>
-                    <posts>{
-   &quot;method&quot; : &quot;monitoring.get_media_state&quot;,
-   &quot;version&quot; : {$DEVLINE_API_VER}
-}</posts>
-                    <headers>
-                        <header>
-                            <name>Accept</name>
-                            <value>application/json</value>
-                        </header>
-                        <header>
-                            <name>Content-Type</name>
-                            <value>application/json</value>
-                        </header>
-                    </headers>
-                    <request_method>POST</request_method>
-                    <output_format>JSON</output_format>
-                    <tags>
-                        <tag>
-                            <tag>Service</tag>
-                            <value>DevLine</value>
-                        </tag>
-                    </tags>
-                    <triggers>
-                        <trigger>
-                            <uuid>ee7ef1089efc4dc1827c09317d904fbf</uuid>
-                            <expression>find(/DevLine 8/devline.server[camera.state],,&quot;like&quot;,&quot;\&quot;message\&quot; : \&quot;forbidden\&quot;&quot;)=1</expression>
-                            <name>DevLine - Forbidden</name>
-                            <priority>HIGH</priority>
-                            <description>Сервер вернул ошибку о том, что у пользователя недостаточно прав. Нужно проверить наличие права Администрирование -&gt; Просмотр мониторинга</description>
-                        </trigger>
-                        <trigger>
-                            <uuid>7553f56f805e4d5a8772a099cfa8e631</uuid>
-                            <expression>last(/DevLine 8/devline.server[camera.state])=&quot;{\&quot;body\&quot;:\&quot;&lt;HTML&gt;&lt;HEAD&gt;&lt;TITLE&gt;401 - Unauthorized&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;&lt;H1&gt;401 - Unauthorized&lt;/H1&gt;&lt;P&gt;&lt;/P&gt;&lt;/BODY&gt;&lt;/HTML&gt;\&quot;}&quot;</expression>
-                            <name>DevLine - User Unauthorized</name>
-                            <priority>HIGH</priority>
-                            <description>Сервер не нашел у себя пользователя с указанными именем и паролем</description>
-                        </trigger>
-                    </triggers>
-                </item>
-                <item>
-                    <uuid>35379382ca5c4c7a97fea767ba3c183a</uuid>
-                    <name>DevLine - Данные сервера</name>
-                    <type>HTTP_AGENT</type>
-                    <key>devline.server[features.all]</key>
-                    <delay>3h</delay>
-                    <value_type>CHAR</value_type>
-                    <trends>0</trends>
-                    <authtype>DIGEST</authtype>
-                    <username>{$DEVLINE_LOGIN}</username>
-                    <password>{$DEVLINE_PASSWORD}</password>
-                    <url>http://{HOST.CONN}:{$DEVLINE_HTTP_PORT}/rpc</url>
-                    <status_codes/>
-                    <post_type>JSON</post_type>
-                    <posts>{
-   &quot;method&quot; : &quot;get_server_info&quot;,
-   &quot;version&quot; : {$DEVLINE_API_VER}
-}</posts>
-                    <headers>
-                        <header>
-                            <name>Accept</name>
-                            <value>application/json</value>
-                        </header>
-                        <header>
-                            <name>Content-Type</name>
-                            <value>application/json</value>
-                        </header>
-                    </headers>
-                    <request_method>POST</request_method>
-                    <output_format>JSON</output_format>
-                    <tags>
-                        <tag>
-                            <tag>Application</tag>
-                            <value>Inventory</value>
-                        </tag>
-                        <tag>
-                            <tag>Service</tag>
-                            <value>DevLine</value>
-                        </tag>
-                    </tags>
-                </item>
-                <item>
                     <uuid>a0f47292dc004276b4eabdc8fd4c487f</uuid>
                     <name>DevLine - Demo State</name>
                     <type>DEPENDENT</type>
-                    <key>devline.server[features.demo]</key>
+                    <key>devline.server.demo_state</key>
                     <delay>0</delay>
                     <valuemap>
                         <name>DevLine Demo State</name>
@@ -243,75 +265,7 @@
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>devline.server[features.all]</key>
-                    </master_item>
-                    <tags>
-                        <tag>
-                            <tag>Application</tag>
-                            <value>Inventory</value>
-                        </tag>
-                        <tag>
-                            <tag>Service</tag>
-                            <value>DevLine</value>
-                        </tag>
-                    </tags>
-                </item>
-                <item>
-                    <uuid>00f7204007fd45ce96c4e50a5c1b4dc2</uuid>
-                    <name>DevLine - HTTP port</name>
-                    <type>DEPENDENT</type>
-                    <key>devline.server[features.http]</key>
-                    <delay>0</delay>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.body.result.info.network.ports.http</parameter>
-                            </parameters>
-                        </step>
-                        <step>
-                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <parameters>
-                                <parameter>24h</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>devline.server[features.all]</key>
-                    </master_item>
-                    <tags>
-                        <tag>
-                            <tag>Application</tag>
-                            <value>Inventory</value>
-                        </tag>
-                        <tag>
-                            <tag>Service</tag>
-                            <value>DevLine</value>
-                        </tag>
-                    </tags>
-                </item>
-                <item>
-                    <uuid>e2a1b8880b6a4180886566b681e5d0e0</uuid>
-                    <name>DevLine - Main port</name>
-                    <type>DEPENDENT</type>
-                    <key>devline.server[features.main]</key>
-                    <delay>0</delay>
-                    <preprocessing>
-                        <step>
-                            <type>JSONPATH</type>
-                            <parameters>
-                                <parameter>$.body.result.info.network.ports.main</parameter>
-                            </parameters>
-                        </step>
-                        <step>
-                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                            <parameters>
-                                <parameter>24h</parameter>
-                            </parameters>
-                        </step>
-                    </preprocessing>
-                    <master_item>
-                        <key>devline.server[features.all]</key>
+                        <key>devline.server.all_features</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -328,7 +282,7 @@
                     <uuid>6c4358d9f1224bc1b5ce1b432ea6858f</uuid>
                     <name>DevLine - Server Name</name>
                     <type>DEPENDENT</type>
-                    <key>devline.server[features.name]</key>
+                    <key>devline.server.name</key>
                     <delay>0</delay>
                     <value_type>CHAR</value_type>
                     <trends>0</trends>
@@ -347,7 +301,75 @@
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>devline.server[features.all]</key>
+                        <key>devline.server.all_features</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>Inventory</value>
+                        </tag>
+                        <tag>
+                            <tag>Service</tag>
+                            <value>DevLine</value>
+                        </tag>
+                    </tags>
+                </item>
+                <item>
+                    <uuid>00f7204007fd45ce96c4e50a5c1b4dc2</uuid>
+                    <name>DevLine - HTTP port</name>
+                    <type>DEPENDENT</type>
+                    <key>devline.server.port[http]</key>
+                    <delay>0</delay>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.body.result.info.network.ports.http</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>devline.server.all_features</key>
+                    </master_item>
+                    <tags>
+                        <tag>
+                            <tag>Application</tag>
+                            <value>Inventory</value>
+                        </tag>
+                        <tag>
+                            <tag>Service</tag>
+                            <value>DevLine</value>
+                        </tag>
+                    </tags>
+                </item>
+                <item>
+                    <uuid>e2a1b8880b6a4180886566b681e5d0e0</uuid>
+                    <name>DevLine - Main port</name>
+                    <type>DEPENDENT</type>
+                    <key>devline.server.port[main]</key>
+                    <delay>0</delay>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <parameters>
+                                <parameter>$.body.result.info.network.ports.main</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
+                            </parameters>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>devline.server.all_features</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -364,7 +386,7 @@
                     <uuid>9b2fd14125074329bd68738ba8be094b</uuid>
                     <name>DevLine - Ping port</name>
                     <type>DEPENDENT</type>
-                    <key>devline.server[features.ping]</key>
+                    <key>devline.server.port[ping]</key>
                     <delay>0</delay>
                     <value_type>CHAR</value_type>
                     <trends>0</trends>
@@ -383,7 +405,7 @@
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>devline.server[features.all]</key>
+                        <key>devline.server.all_features</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -400,7 +422,7 @@
                     <uuid>9d9d749a7bfd41cf9fcd180f79fdde93</uuid>
                     <name>DevLine - RTSP port</name>
                     <type>DEPENDENT</type>
-                    <key>devline.server[features.rtsp]</key>
+                    <key>devline.server.port[rtsp]</key>
                     <delay>0</delay>
                     <preprocessing>
                         <step>
@@ -417,7 +439,7 @@
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>devline.server[features.all]</key>
+                        <key>devline.server.all_features</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -434,7 +456,7 @@
                     <uuid>203bd087310446ae9af3a2691527d179</uuid>
                     <name>DevLine - Server Target</name>
                     <type>DEPENDENT</type>
-                    <key>devline.server[features.target]</key>
+                    <key>devline.server.target</key>
                     <delay>0</delay>
                     <value_type>CHAR</value_type>
                     <trends>0</trends>
@@ -453,7 +475,7 @@
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>devline.server[features.all]</key>
+                        <key>devline.server.all_features</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -470,7 +492,7 @@
                     <uuid>2e6ef4863e1c4787b2002517edff5272</uuid>
                     <name>DevLine - Server type</name>
                     <type>DEPENDENT</type>
-                    <key>devline.server[features.type]</key>
+                    <key>devline.server.type</key>
                     <delay>0</delay>
                     <value_type>CHAR</value_type>
                     <trends>0</trends>
@@ -489,7 +511,7 @@
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>devline.server[features.all]</key>
+                        <key>devline.server.all_features</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -506,7 +528,7 @@
                     <uuid>0ab6647cccce4e1a916255b1d19a16f2</uuid>
                     <name>DevLine - Server Version</name>
                     <type>DEPENDENT</type>
-                    <key>devline.server[features.version]</key>
+                    <key>devline.server.version</key>
                     <delay>0</delay>
                     <value_type>CHAR</value_type>
                     <trends>0</trends>
@@ -525,7 +547,7 @@
                         </step>
                     </preprocessing>
                     <master_item>
-                        <key>devline.server[features.all]</key>
+                        <key>devline.server.all_features</key>
                     </master_item>
                     <tags>
                         <tag>
@@ -540,7 +562,7 @@
                     <triggers>
                         <trigger>
                             <uuid>d68f7a0a4fe14aa3acbca8c2d5af544c</uuid>
-                            <expression>last(/DevLine 8/devline.server[features.version],#2)&lt;&gt;last(/DevLine 8/devline.server[features.version])</expression>
+                            <expression>last(/DevLine 8/devline.server.version,#2)&lt;&gt;last(/DevLine 8/devline.server.version)</expression>
                             <name>DevLine Version was changed</name>
                             <priority>INFO</priority>
                             <manual_close>YES</manual_close>
@@ -551,7 +573,7 @@
                     <uuid>1ce3cd6f45ce43df8d1aea529a9a03b9</uuid>
                     <name>DevLine - Хранилища</name>
                     <type>HTTP_AGENT</type>
-                    <key>devline.server[storage.state]</key>
+                    <key>devline.storage.list</key>
                     <delay>5m</delay>
                     <value_type>CHAR</value_type>
                     <trends>0</trends>
@@ -570,6 +592,12 @@
                             <parameters>
                                 <parameter>{&quot;storages&quot;:[</parameter>
                                 <parameter>{&quot;data&quot;:[</parameter>
+                            </parameters>
+                        </step>
+                        <step>
+                            <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                            <parameters>
+                                <parameter>24h</parameter>
                             </parameters>
                         </step>
                     </preprocessing>
@@ -609,7 +637,7 @@
                     <uuid>9621463e20e44d16880de7b3c2c708bd</uuid>
                     <name>Camera discovery</name>
                     <type>DEPENDENT</type>
-                    <key>devline.server[camera.discovery]</key>
+                    <key>devline.camera.discovery</key>
                     <delay>0</delay>
                     <lifetime>5d</lifetime>
                     <item_prototypes>
@@ -617,7 +645,7 @@
                             <uuid>1a47f2db27f74ddca3110187cb29483d</uuid>
                             <name>Devline - {#NAME} Admin State</name>
                             <type>DEPENDENT</type>
-                            <key>devline.server[camera.{#NUM}.admin.state]</key>
+                            <key>devline.camera.admin_state[{#NUM},camera]</key>
                             <delay>0</delay>
                             <valuemap>
                                 <name>Devline Camera Admin State</name>
@@ -651,45 +679,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>devline.server[camera.state]</key>
-                            </master_item>
-                            <tags>
-                                <tag>
-                                    <tag>Camera</tag>
-                                    <value>{#NAME}</value>
-                                </tag>
-                                <tag>
-                                    <tag>Service</tag>
-                                    <value>DevLine</value>
-                                </tag>
-                            </tags>
-                        </item_prototype>
-                        <item_prototype>
-                            <uuid>c6fed9a1ce7f4e55b926e681c0628eb8</uuid>
-                            <name>Devline - Camera {#NUM} Name</name>
-                            <type>DEPENDENT</type>
-                            <key>devline.server[camera.{#NUM}.name]</key>
-                            <delay>0</delay>
-                            <value_type>CHAR</value_type>
-                            <trends>0</trends>
-                            <status>DISABLED</status>
-                            <discover>NO_DISCOVER</discover>
-                            <preprocessing>
-                                <step>
-                                    <type>JSONPATH</type>
-                                    <parameters>
-                                        <parameter>$.data.[{#NUM}].name</parameter>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <parameters>
-                                        <parameter>24h</parameter>
-                                    </parameters>
-                                </step>
-                            </preprocessing>
-                            <master_item>
-                                <key>devline.server[camera.all]</key>
+                                <key>devline.camera.state</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -706,7 +696,7 @@
                             <uuid>4d3dfb1988ca4703a62938a7a61db551</uuid>
                             <name>Devline - {#NAME} Stream1 Admin State</name>
                             <type>DEPENDENT</type>
-                            <key>devline.server[camera.{#NUM}.stream1.admin.state]</key>
+                            <key>devline.camera.admin_state[{#NUM},stream1]</key>
                             <delay>0</delay>
                             <valuemap>
                                 <name>Devline Camera Admin State</name>
@@ -740,7 +730,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>devline.server[camera.state]</key>
+                                <key>devline.camera.state</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -751,56 +741,9 @@
                                     <tag>Service</tag>
                                     <value>DevLine</value>
                                 </tag>
-                            </tags>
-                        </item_prototype>
-                        <item_prototype>
-                            <uuid>ff6cc7576db947ba8627f369b048a678</uuid>
-                            <name>Devline - {#NAME} Stream1 Status</name>
-                            <type>DEPENDENT</type>
-                            <key>devline.server[camera.{#NUM}.stream1.status]</key>
-                            <delay>0</delay>
-                            <valuemap>
-                                <name>DevLine Stream Status</name>
-                            </valuemap>
-                            <preprocessing>
-                                <step>
-                                    <type>JSONPATH</type>
-                                    <parameters>
-                                        <parameter>$.body.result.state.cameras.{#NUM}.streams.video.active</parameter>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>STR_REPLACE</type>
-                                    <parameters>
-                                        <parameter>true</parameter>
-                                        <parameter>1</parameter>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>STR_REPLACE</type>
-                                    <parameters>
-                                        <parameter>false</parameter>
-                                        <parameter>0</parameter>
-                                    </parameters>
-                                </step>
-                                <step>
-                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
-                                    <parameters>
-                                        <parameter>24h</parameter>
-                                    </parameters>
-                                </step>
-                            </preprocessing>
-                            <master_item>
-                                <key>devline.server[camera.state]</key>
-                            </master_item>
-                            <tags>
                                 <tag>
-                                    <tag>Camera</tag>
-                                    <value>{#NAME}</value>
-                                </tag>
-                                <tag>
-                                    <tag>Service</tag>
-                                    <value>DevLine</value>
+                                    <tag>Video</tag>
+                                    <value>{#NAME} stream 1</value>
                                 </tag>
                             </tags>
                         </item_prototype>
@@ -808,7 +751,7 @@
                             <uuid>2939cfc5afed4e6d80e7adb040901794</uuid>
                             <name>Devline - {#NAME} Stream2 Admin State</name>
                             <type>DEPENDENT</type>
-                            <key>devline.server[camera.{#NUM}.stream2.admin.state]</key>
+                            <key>devline.camera.admin_state[{#NUM},stream2]</key>
                             <delay>0</delay>
                             <valuemap>
                                 <name>Devline Camera Admin State</name>
@@ -842,7 +785,49 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>devline.server[camera.state]</key>
+                                <key>devline.camera.state</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Camera</tag>
+                                    <value>{#NAME}</value>
+                                </tag>
+                                <tag>
+                                    <tag>Service</tag>
+                                    <value>DevLine</value>
+                                </tag>
+                                <tag>
+                                    <tag>Video</tag>
+                                    <value>{#NAME} stream 2</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
+                            <uuid>c6fed9a1ce7f4e55b926e681c0628eb8</uuid>
+                            <name>Devline - Camera {#NUM} Name</name>
+                            <type>DEPENDENT</type>
+                            <key>devline.camera.name[{#NUM}]</key>
+                            <delay>0</delay>
+                            <value_type>CHAR</value_type>
+                            <trends>0</trends>
+                            <status>DISABLED</status>
+                            <discover>NO_DISCOVER</discover>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.data.[{#NUM}].name</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <parameters>
+                                        <parameter>24h</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>devline.camera.list</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -856,10 +841,65 @@
                             </tags>
                         </item_prototype>
                         <item_prototype>
+                            <uuid>ff6cc7576db947ba8627f369b048a678</uuid>
+                            <name>Devline - {#NAME} Stream1 Status</name>
+                            <type>DEPENDENT</type>
+                            <key>devline.camera.status[{#NUM},stream1]</key>
+                            <delay>0</delay>
+                            <valuemap>
+                                <name>DevLine Stream Status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <parameters>
+                                        <parameter>$.body.result.state.cameras.{#NUM}.streams.video.active</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <parameters>
+                                        <parameter>true</parameter>
+                                        <parameter>1</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>STR_REPLACE</type>
+                                    <parameters>
+                                        <parameter>false</parameter>
+                                        <parameter>0</parameter>
+                                    </parameters>
+                                </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <parameters>
+                                        <parameter>24h</parameter>
+                                    </parameters>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>devline.camera.state</key>
+                            </master_item>
+                            <tags>
+                                <tag>
+                                    <tag>Camera</tag>
+                                    <value>{#NAME}</value>
+                                </tag>
+                                <tag>
+                                    <tag>Service</tag>
+                                    <value>DevLine</value>
+                                </tag>
+                                <tag>
+                                    <tag>Video</tag>
+                                    <value>{#NAME} stream 1</value>
+                                </tag>
+                            </tags>
+                        </item_prototype>
+                        <item_prototype>
                             <uuid>a733e70831b84329ac4c7365b0668387</uuid>
                             <name>Devline - {#NAME} Stream2 Status</name>
                             <type>DEPENDENT</type>
-                            <key>devline.server[camera.{#NUM}.stream2.status]</key>
+                            <key>devline.camera.status[{#NUM},stream2]</key>
                             <delay>0</delay>
                             <valuemap>
                                 <name>DevLine Stream Status</name>
@@ -893,7 +933,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>devline.server[camera.state]</key>
+                                <key>devline.camera.state</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -904,13 +944,17 @@
                                     <tag>Service</tag>
                                     <value>DevLine</value>
                                 </tag>
+                                <tag>
+                                    <tag>Video</tag>
+                                    <value>{#NAME} stream 2</value>
+                                </tag>
                             </tags>
                         </item_prototype>
                     </item_prototypes>
                     <trigger_prototypes>
                         <trigger_prototype>
                             <uuid>ed1152ca4d93493f90b347e86667ae8c</uuid>
-                            <expression>last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0</expression>
+                            <expression>last(/DevLine 8/devline.camera.admin_state[{#NUM},camera])=1 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream1])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream1])=0 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream2])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream2])=0</expression>
                             <name>DevLine - {#NAME} Fail</name>
                             <opdata>Camera - {ITEM.LASTVALUE1}, Stream1 - {ITEM.LASTVALUE3}, Stream2 - {ITEM.LASTVALUE5}</opdata>
                             <priority>AVERAGE</priority>
@@ -923,14 +967,14 @@
                         </trigger_prototype>
                         <trigger_prototype>
                             <uuid>f47d5396908e49e88620a23691748abb</uuid>
-                            <expression>last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0</expression>
+                            <expression>last(/DevLine 8/devline.camera.admin_state[{#NUM},camera])=1 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream1])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream1])=0</expression>
                             <name>DevLine - {#NAME} Stream1 Fail</name>
                             <opdata>{ITEM.LASTVALUE3}</opdata>
                             <priority>WARNING</priority>
                             <dependencies>
                                 <dependency>
                                     <name>DevLine - {#NAME} Fail</name>
-                                    <expression>last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0</expression>
+                                    <expression>last(/DevLine 8/devline.camera.admin_state[{#NUM},camera])=1 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream1])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream1])=0 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream2])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream2])=0</expression>
                                 </dependency>
                             </dependencies>
                             <tags>
@@ -942,7 +986,7 @@
                         </trigger_prototype>
                         <trigger_prototype>
                             <uuid>468fbf6acf2f4d2780db6d7d73ebc2b9</uuid>
-                            <expression>last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0</expression>
+                            <expression>last(/DevLine 8/devline.camera.admin_state[{#NUM},camera])=1 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream2])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream2])=0</expression>
                             <name>DevLine - {#NAME} Stream2 Fail</name>
                             <opdata>{ITEM.LASTVALUE3}</opdata>
                             <priority>WARNING</priority>
@@ -950,7 +994,7 @@
                             <dependencies>
                                 <dependency>
                                     <name>DevLine - {#NAME} Fail</name>
-                                    <expression>last(/DevLine 8/devline.server[camera.{#NUM}.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream1.status])=0 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.admin.state])=1 and last(/DevLine 8/devline.server[camera.{#NUM}.stream2.status])=0</expression>
+                                    <expression>last(/DevLine 8/devline.camera.admin_state[{#NUM},camera])=1 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream1])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream1])=0 and last(/DevLine 8/devline.camera.admin_state[{#NUM},stream2])=1 and last(/DevLine 8/devline.camera.status[{#NUM},stream2])=0</expression>
                                 </dependency>
                             </dependencies>
                             <tags>
@@ -962,7 +1006,7 @@
                         </trigger_prototype>
                     </trigger_prototypes>
                     <master_item>
-                        <key>devline.server[camera.all]</key>
+                        <key>devline.camera.list</key>
                     </master_item>
                     <lld_macro_paths>
                         <lld_macro_path>
@@ -988,7 +1032,7 @@
                     <uuid>9909a58739014ec2b27cfafd53586e60</uuid>
                     <name>Storage discovery</name>
                     <type>DEPENDENT</type>
-                    <key>devline.server[storage.discovery]</key>
+                    <key>devline.storage.discovery</key>
                     <delay>0</delay>
                     <lifetime>14d</lifetime>
                     <item_prototypes>
@@ -996,13 +1040,10 @@
                             <uuid>5e64e32c19ff42de9104bd00d3ecf058</uuid>
                             <name>Devline - Storage {#PATH} free space</name>
                             <type>DEPENDENT</type>
-                            <key>devline.server[storage.{#PATH}.free_space]</key>
+                            <key>devline.storage.free_space[{#PATH}]</key>
                             <delay>0</delay>
                             <units>b</units>
                             <description>Объем свободного место в хранилище</description>
-                            <valuemap>
-                                <name>DevLine Storage Availability</name>
-                            </valuemap>
                             <preprocessing>
                                 <step>
                                     <type>JSONPATH</type>
@@ -1032,7 +1073,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>devline.server[storage.state]</key>
+                                <key>devline.storage.list</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -1053,7 +1094,7 @@
                             <uuid>71d60ffc0444491188b3d70aa407385c</uuid>
                             <name>Devline - Storage {#PATH} state</name>
                             <type>DEPENDENT</type>
-                            <key>devline.server[storage.{#PATH}.state]</key>
+                            <key>devline.storage.state[{#PATH}]</key>
                             <delay>0</delay>
                             <description>Флаг доступности хранилища</description>
                             <valuemap>
@@ -1080,9 +1121,15 @@
                                         <parameter>0</parameter>
                                     </parameters>
                                 </step>
+                                <step>
+                                    <type>DISCARD_UNCHANGED_HEARTBEAT</type>
+                                    <parameters>
+                                        <parameter>24h</parameter>
+                                    </parameters>
+                                </step>
                             </preprocessing>
                             <master_item>
-                                <key>devline.server[storage.state]</key>
+                                <key>devline.storage.list</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -1101,7 +1148,7 @@
                             <trigger_prototypes>
                                 <trigger_prototype>
                                     <uuid>ba534f3e460a412b8548034edd088fe1</uuid>
-                                    <expression>last(/DevLine 8/devline.server[storage.{#PATH}.state],#2)=0</expression>
+                                    <expression>last(/DevLine 8/devline.storage.state[{#PATH}],#2)=0</expression>
                                     <name>Хранилище {#PATH} недоступно</name>
                                     <priority>HIGH</priority>
                                 </trigger_prototype>
@@ -1111,7 +1158,7 @@
                             <uuid>c572d58bb66e45768984bf77d7e85c67</uuid>
                             <name>Devline - Storage {#PATH} write datarate</name>
                             <type>DEPENDENT</type>
-                            <key>devline.server[storage.{#PATH}.write.datarate]</key>
+                            <key>devline.storage.write_datarate[{#PATH}]</key>
                             <delay>0</delay>
                             <value_type>FLOAT</value_type>
                             <units>b/s</units>
@@ -1139,7 +1186,7 @@
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>devline.server[storage.state]</key>
+                                <key>devline.storage.list</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -1155,69 +1202,12 @@
                                     <value>{#PATH}</value>
                                 </tag>
                             </tags>
-                            <trigger_prototypes>
-                                <trigger_prototype>
-                                    <uuid>d888576bc3704bf7bf53a7e59afb2720</uuid>
-                                    <expression>max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_HIGH})=0</expression>
-                                    <name>Не идет запись в хранилище {#PATH} в течение {$DEVLINE_RECORD_HIGH}</name>
-                                    <discover>NO_DISCOVER</discover>
-                                    <priority>HIGH</priority>
-                                    <tags>
-                                        <tag>
-                                            <tag>Service</tag>
-                                            <value>DevLine</value>
-                                        </tag>
-                                    </tags>
-                                </trigger_prototype>
-                                <trigger_prototype>
-                                    <uuid>9a5a1771eafa4e4eb9d263407bbc83f3</uuid>
-                                    <expression>max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_INFO})=0</expression>
-                                    <name>Не идет запись в хранилище {#PATH} в течение {$DEVLINE_RECORD_INFO}</name>
-                                    <discover>NO_DISCOVER</discover>
-                                    <priority>INFO</priority>
-                                    <dependencies>
-                                        <dependency>
-                                            <name>Не идет запись в хранилище {#PATH} в течение {$DEVLINE_RECORD_HIGH}</name>
-                                            <expression>max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_HIGH})=0</expression>
-                                        </dependency>
-                                        <dependency>
-                                            <name>Не идет запись в хранилище {#PATH} в течение {$DEVLINE_RECORD_WARN}</name>
-                                            <expression>max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_WARN})=0</expression>
-                                        </dependency>
-                                    </dependencies>
-                                    <tags>
-                                        <tag>
-                                            <tag>Service</tag>
-                                            <value>DevLine</value>
-                                        </tag>
-                                    </tags>
-                                </trigger_prototype>
-                                <trigger_prototype>
-                                    <uuid>2690c46f731540beb9ed712bccb1f76c</uuid>
-                                    <expression>max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_WARN})=0</expression>
-                                    <name>Не идет запись в хранилище {#PATH} в течение {$DEVLINE_RECORD_WARN}</name>
-                                    <discover>NO_DISCOVER</discover>
-                                    <priority>WARNING</priority>
-                                    <dependencies>
-                                        <dependency>
-                                            <name>Не идет запись в хранилище {#PATH} в течение {$DEVLINE_RECORD_HIGH}</name>
-                                            <expression>max(/DevLine 8/devline.server[storage.{#PATH}.write.datarate],{$DEVLINE_RECORD_HIGH})=0</expression>
-                                        </dependency>
-                                    </dependencies>
-                                    <tags>
-                                        <tag>
-                                            <tag>Service</tag>
-                                            <value>DevLine</value>
-                                        </tag>
-                                    </tags>
-                                </trigger_prototype>
-                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <uuid>224125bb59c34ce49bb912346374d0b3</uuid>
                             <name>Devline - Storage {#PATH} last error time</name>
                             <type>DEPENDENT</type>
-                            <key>devline.server[storage.{#PATH}.write.error]</key>
+                            <key>devline.storage.write_error[{#PATH}]</key>
                             <delay>0</delay>
                             <value_type>CHAR</value_type>
                             <trends>0</trends>
@@ -1272,7 +1262,7 @@ return date[3] + &quot;:&quot; + date[4] + &quot;:&quot; + date[5] + &quot;.&quo
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>devline.server[storage.state]</key>
+                                <key>devline.storage.list</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -1288,12 +1278,20 @@ return date[3] + &quot;:&quot; + date[4] + &quot;:&quot; + date[5] + &quot;.&quo
                                     <value>{#PATH}</value>
                                 </tag>
                             </tags>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <uuid>7e888e8fa21347849af33cddb5770780</uuid>
+                                    <expression>find(/DevLine 8/devline.storage.write_error[{#PATH}],,,&quot;OK&quot;)=0</expression>
+                                    <name>Ошибка в хранилище {#PATH}</name>
+                                    <priority>HIGH</priority>
+                                </trigger_prototype>
+                            </trigger_prototypes>
                         </item_prototype>
                         <item_prototype>
                             <uuid>1a3b9983e2134a7baa51c459e4aeca2e</uuid>
                             <name>Devline - Storage {#PATH} write queue</name>
                             <type>DEPENDENT</type>
-                            <key>devline.server[storage.{#PATH}.write.queue]</key>
+                            <key>devline.storage.write_queue[{#PATH}]</key>
                             <delay>0</delay>
                             <value_type>FLOAT</value_type>
                             <units>b</units>
@@ -1321,7 +1319,7 @@ return date[3] + &quot;:&quot; + date[4] + &quot;:&quot; + date[5] + &quot;.&quo
                                 </step>
                             </preprocessing>
                             <master_item>
-                                <key>devline.server[storage.state]</key>
+                                <key>devline.storage.list</key>
                             </master_item>
                             <tags>
                                 <tag>
@@ -1340,7 +1338,7 @@ return date[3] + &quot;:&quot; + date[4] + &quot;:&quot; + date[5] + &quot;.&quo
                         </item_prototype>
                     </item_prototypes>
                     <master_item>
-                        <key>devline.server[storage.state]</key>
+                        <key>devline.storage.list</key>
                     </master_item>
                     <lld_macro_paths>
                         <lld_macro_path>
@@ -1368,21 +1366,6 @@ return date[3] + &quot;:&quot; + date[4] + &quot;:&quot; + date[5] + &quot;.&quo
                 <macro>
                     <macro>{$DEVLINE_PASSWORD}</macro>
                     <type>SECRET_TEXT</type>
-                </macro>
-                <macro>
-                    <macro>{$DEVLINE_RECORD_HIGH}</macro>
-                    <value>24h</value>
-                    <description>Период для формирования ошибки записи важности &quot;High&quot;</description>
-                </macro>
-                <macro>
-                    <macro>{$DEVLINE_RECORD_INFO}</macro>
-                    <value>30m</value>
-                    <description>Период для формирования ошибки записи важности &quot;Info&quot;</description>
-                </macro>
-                <macro>
-                    <macro>{$DEVLINE_RECORD_WARN}</macro>
-                    <value>3h</value>
-                    <description>Период для формирования ошибки записи важности &quot;Warning&quot;</description>
                 </macro>
             </macros>
             <valuemaps>
