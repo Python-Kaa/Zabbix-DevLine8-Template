@@ -5,3 +5,5 @@
 [Шаблон для Devline 8.2](https://github.com/Python-Kaa/Zabbix-DevLine8-Template/tree/main/Devline%208.2)
 
 [Шаблон для Devline 8.3](https://github.com/Python-Kaa/Zabbix-DevLine8-Template/tree/main/Devline%208.3%20and%20above)
+
+Нужны права на просмотр мониторинга и настройку камер
